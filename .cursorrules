@@ -1,0 +1,7 @@
+Follow coding best practices.
+Do not be verbose with comments.
+Create small, reusable components that have a single responsibility.
+Always add type annotations to constants, variables, function parameters, and return types.
+Keep styling to a bare minimum, don't add additional `sx` props unless they are necessary.
+The project uses Next.js v15 and the App Router (app/) should be used instead of the Pages Router (pages/).
+The project uses MUI v7, so `Grid` should be used instead of `GridLegacy`. <Grid container spacing={2}><Grid item xs={6} md={8}><Item>xs=6 md=8</Item></Grid> should be written as <Grid container spacing={2}><Grid size={{ xs: 6, md: 8 }}><Item>xs=6 md=8</Item></Grid>.
