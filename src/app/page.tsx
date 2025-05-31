@@ -1,12 +1,14 @@
 "use client";
 
-import { Alert, Snackbar } from "@mui/material";
+import { Alert, Box, Snackbar, Toolbar } from "@mui/material";
 import React from "react";
 
+import { AddAgentModal } from "@/components/appbar/AddAgentModal";
+import { AppBar } from "@/components/appbar/AppBar";
 import { Chat } from "@/components/chat/Chat";
 import { A2AClient } from "@/lib/a2a/client/client";
 import { createMessageSendParamsObject } from "@/lib/utils";
-import { Message, SendMessageRequest, SendMessageSuccessResponse } from "@/types";
+import { AgentCard, Message, SendMessageRequest, SendMessageSuccessResponse } from "@/types";
 
 export default function Home() {
   const [messages, setMessages] = React.useState<Message[]>([]);
@@ -18,6 +20,9 @@ export default function Home() {
   const [toastSeverity, setToastSeverity] = React.useState<
     "error" | "warning" | "info" | "success"
   >("error");
+  const [agents, setAgents] = React.useState<AgentCard[]>([]);
+  const [activeAgent, setActiveAgent] = React.useState<AgentCard | null>(null);
+  const [addAgentModalOpen, setAddAgentModalOpen] = React.useState<boolean>(false);
 
   const showToast = (
     message: string,
@@ -36,10 +41,56 @@ export default function Home() {
     setToastOpen(false);
   };
 
+  const handleAgentAdded = (agent: AgentCard): void => {
+    setAgents((prev) => {
+      // Check if agent already exists
+      const existingIndex = prev.findIndex((existingAgent) => existingAgent.url === agent.url);
+
+      if (existingIndex !== -1) {
+        // Replace the existing agent
+        const newAgents = [...prev];
+        newAgents[existingIndex] = agent;
+
+        // Update active agent if we're replacing the currently active one
+        if (activeAgent?.url === agent.url) {
+          setActiveAgent(agent);
+        }
+
+        return newAgents;
+      } else {
+        const newAgents = [...prev, agent];
+
+        // Set as active agent if it's the first one
+        if (prev.length === 0) {
+          setActiveAgent(agent);
+        }
+
+        showToast(`Added ${agent.name}`, "success");
+
+        return newAgents;
+      }
+    });
+  };
+
+  const handleAgentSelect = (agent: AgentCard): void => {
+    setMessages([]);
+    setTaskId(undefined);
+    setContextId(undefined);
+    setActiveAgent(agent);
+  };
+
   const handleSendMessage = async (messageText: string): Promise<void> => {
+    if (!activeAgent) {
+      showToast("Please add an agent", "warning");
+
+      return;
+    }
+
     setLoading(true);
 
     try {
+      const client: A2AClient = new A2AClient({ agentCard: activeAgent });
+
       // Create the message send params using the utility function
       const messageSendParams = createMessageSendParamsObject(messageText, taskId, contextId);
 
@@ -92,15 +143,27 @@ export default function Home() {
     }
   };
 
-  const client = React.useMemo(() => {
-    return new A2AClient({
-      url: "http://localhost:9999",
-    });
-  }, []);
-
   return (
-    <>
-      <Chat messages={messages} onSendMessage={handleSendMessage} loading={loading} />
+    <Box sx={{ minHeight: "100vh", display: "flex", flexDirection: "column" }}>
+      <AppBar
+        agents={agents}
+        activeAgent={activeAgent}
+        onAgentSelect={handleAgentSelect}
+        onAddAgent={() => setAddAgentModalOpen(true)}
+      />
+
+      <Toolbar />
+
+      <Box sx={{ flex: 1 }}>
+        <Chat messages={messages} onSendMessage={handleSendMessage} loading={loading} />
+      </Box>
+
+      <AddAgentModal
+        open={addAgentModalOpen}
+        onClose={() => setAddAgentModalOpen(false)}
+        onAgentAdded={handleAgentAdded}
+        onError={(message) => showToast(message, "error")}
+      />
 
       <Snackbar
         open={toastOpen}
@@ -117,6 +180,6 @@ export default function Home() {
           {toastMessage}
         </Alert>
       </Snackbar>
-    </>
+    </Box>
   );
 }

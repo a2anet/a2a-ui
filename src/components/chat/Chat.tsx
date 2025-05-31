@@ -32,12 +32,11 @@ export const Chat: React.FC<ChatProps> = ({ messages, onSendMessage, loading }) 
   return (
     <Box
       sx={{
-        minHeight: "100vh",
         bgcolor: "background.default",
       }}
     >
       {/* Messages Container */}
-      <Container maxWidth="md" sx={{ py: 2, pb: 34 }}>
+      <Container maxWidth="md" sx={{ pt: 2, pb: 34 }}>
         {messages.map((message: Message) => (
           <Box key={message.messageId}>
             {message.role === "user" ? (
