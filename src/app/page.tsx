@@ -10,6 +10,7 @@ import { A2AClient } from "@/lib/a2a/client/client";
 import { createMessageSendParamsObject } from "@/lib/utils";
 import {
   AgentCard,
+  Artifact,
   Message,
   SendMessageRequest,
   SendMessageResponse,
@@ -34,27 +35,32 @@ export default function Home() {
   const [addAgentModalOpen, setAddAgentModalOpen] = React.useState<boolean>(false);
 
   // Derive messages from tasks and pending message
-  const messages: Message[] = React.useMemo(() => {
-    const allMessages: Message[] = [];
+  const messages: (Message | Artifact)[] = React.useMemo(() => {
+    const allItems: (Message | Artifact)[] = [];
 
     for (const task of tasks) {
       // Add messages from task history
       if (task.history) {
-        allMessages.push(...task.history);
+        allItems.push(...task.history);
       }
 
       // Add the latest status message if it exists
       if (task.status.message) {
-        allMessages.push(task.status.message);
+        allItems.push(task.status.message);
+      }
+
+      // Add artifacts if they exist
+      if (task.artifacts) {
+        allItems.push(...task.artifacts);
       }
     }
 
     // Add pending message for immediate display
     if (pendingMessage) {
-      allMessages.push(pendingMessage);
+      allItems.push(pendingMessage);
     }
 
-    return allMessages;
+    return allItems;
   }, [tasks, pendingMessage]);
 
   const showToast = (

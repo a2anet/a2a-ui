@@ -4,12 +4,13 @@ import { Box, Container } from "@mui/material";
 import React from "react";
 
 import { AIMessage } from "@/components/chat/AIMessage";
+import { ArtifactCard } from "@/components/chat/ArtifactCard";
 import { ChatTextField } from "@/components/chat/ChatTextField";
 import { UserMessage } from "@/components/chat/UserMessage";
-import { Message } from "@/types";
+import { Artifact, Message } from "@/types";
 
 interface ChatProps {
-  messages: Message[];
+  messages: (Message | Artifact)[];
   onSendMessage: (message: string) => void;
   loading: boolean;
   textFieldValue: string;
@@ -37,6 +38,30 @@ export const Chat: React.FC<ChatProps> = ({
     scrollToBottom();
   }, [messages]);
 
+  const renderItem = (item: Message | Artifact): React.ReactNode => {
+    if ("kind" in item && item.kind === "message") {
+      const message: Message = item as Message;
+
+      return (
+        <Box key={message.messageId} sx={{ mb: 4 }}>
+          {message.role === "user" ? (
+            <UserMessage message={message} />
+          ) : (
+            <AIMessage message={message} />
+          )}
+        </Box>
+      );
+    } else {
+      const artifact: Artifact = item as Artifact;
+
+      return (
+        <Box key={artifact.artifactId} sx={{ mb: 4 }}>
+          <ArtifactCard artifact={artifact} />
+        </Box>
+      );
+    }
+  };
+
   return (
     <Box
       sx={{
@@ -45,15 +70,7 @@ export const Chat: React.FC<ChatProps> = ({
     >
       {/* Messages Container */}
       <Container maxWidth="md" sx={{ pt: 2, pb: 34 }}>
-        {messages.map((message: Message) => (
-          <Box key={message.messageId} sx={{ mb: 4 }}>
-            {message.role === "user" ? (
-              <UserMessage message={message} />
-            ) : (
-              <AIMessage message={message} />
-            )}
-          </Box>
-        ))}
+        {messages.map((item) => renderItem(item))}
         <div ref={messagesEndRef} />
       </Container>
 
