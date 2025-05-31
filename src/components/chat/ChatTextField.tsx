@@ -5,16 +5,24 @@ import React from "react";
 interface ChatTextFieldProps {
   onSendMessage: (message: string) => void;
   loading?: boolean;
+  value: string;
+  onChange: (value: string) => void;
 }
 
-export const ChatTextField: React.FC<ChatTextFieldProps> = ({ onSendMessage, loading = false }) => {
-  const [message, setMessage] = React.useState<string>("");
-
+export const ChatTextField: React.FC<ChatTextFieldProps> = ({
+  onSendMessage,
+  loading = false,
+  value,
+  onChange,
+}) => {
   const handleSend = (): void => {
-    if (message.trim() && !loading) {
-      onSendMessage(message.trim());
-      setMessage("");
+    if (value.trim() && !loading) {
+      onSendMessage(value.trim());
     }
+  };
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
+    onChange(e.target.value);
   };
 
   const handleKeyPress = (event: React.KeyboardEvent): void => {
@@ -26,8 +34,8 @@ export const ChatTextField: React.FC<ChatTextFieldProps> = ({ onSendMessage, loa
 
   return (
     <TextField
-      value={message}
-      onChange={(e) => setMessage(e.target.value)}
+      value={value}
+      onChange={handleChange}
       onKeyDown={handleKeyPress}
       fullWidth
       multiline
@@ -56,7 +64,7 @@ export const ChatTextField: React.FC<ChatTextFieldProps> = ({ onSendMessage, loa
             <InputAdornment position="end" sx={{ alignSelf: "flex-end" }}>
               <IconButton
                 onClick={handleSend}
-                disabled={!message.trim() && !loading}
+                disabled={!value.trim() && !loading}
                 sx={{
                   bgcolor: loading ? "grey.400" : "grey.900",
                   color: "white",

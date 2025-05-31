@@ -13,7 +13,6 @@ export const UserMessage: React.FC<UserMessageProps> = ({ message }) => {
       sx={{
         display: "flex",
         justifyContent: "flex-end",
-        mb: 2,
       }}
     >
       <Paper

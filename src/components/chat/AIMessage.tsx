@@ -13,7 +13,6 @@ export const AIMessage: React.FC<AIMessageProps> = ({ message }) => {
       sx={{
         display: "flex",
         justifyContent: "flex-start",
-        mb: 2,
       }}
     >
       <MessageTypography message={message} />

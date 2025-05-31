@@ -12,9 +12,17 @@ interface ChatProps {
   messages: Message[];
   onSendMessage: (message: string) => void;
   loading: boolean;
+  textFieldValue: string;
+  onTextFieldChange: (value: string) => void;
 }
 
-export const Chat: React.FC<ChatProps> = ({ messages, onSendMessage, loading }) => {
+export const Chat: React.FC<ChatProps> = ({
+  messages,
+  onSendMessage,
+  loading,
+  textFieldValue,
+  onTextFieldChange,
+}) => {
   const messagesEndRef = React.useRef<HTMLDivElement>(null);
 
   const handleSendMessage = (message: string): void => {
@@ -38,7 +46,7 @@ export const Chat: React.FC<ChatProps> = ({ messages, onSendMessage, loading }) 
       {/* Messages Container */}
       <Container maxWidth="md" sx={{ pt: 2, pb: 34 }}>
         {messages.map((message: Message) => (
-          <Box key={message.messageId}>
+          <Box key={message.messageId} sx={{ mb: 4 }}>
             {message.role === "user" ? (
               <UserMessage message={message} />
             ) : (
@@ -63,7 +71,12 @@ export const Chat: React.FC<ChatProps> = ({ messages, onSendMessage, loading }) 
         }}
       >
         <Container maxWidth="md">
-          <ChatTextField onSendMessage={handleSendMessage} loading={loading} />
+          <ChatTextField
+            onSendMessage={handleSendMessage}
+            loading={loading}
+            value={textFieldValue}
+            onChange={onTextFieldChange}
+          />
         </Container>
       </Box>
     </Box>

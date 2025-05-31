@@ -8,10 +8,19 @@ import { AppBar } from "@/components/appbar/AppBar";
 import { Chat } from "@/components/chat/Chat";
 import { A2AClient } from "@/lib/a2a/client/client";
 import { createMessageSendParamsObject } from "@/lib/utils";
-import { AgentCard, Message, SendMessageRequest, SendMessageSuccessResponse } from "@/types";
+import {
+  AgentCard,
+  Message,
+  SendMessageRequest,
+  SendMessageResponse,
+  SendMessageSuccessResponse,
+  Task,
+} from "@/types";
 
 export default function Home() {
-  const [messages, setMessages] = React.useState<Message[]>([]);
+  const [tasks, setTasks] = React.useState<Task[]>([]);
+  const [pendingMessage, setPendingMessage] = React.useState<Message | null>(null);
+  const [messageText, setMessageText] = React.useState<string>("");
   const [loading, setLoading] = React.useState<boolean>(false);
   const [taskId, setTaskId] = React.useState<string | undefined>(undefined);
   const [contextId, setContextId] = React.useState<string | undefined>(undefined);
@@ -23,6 +32,30 @@ export default function Home() {
   const [agents, setAgents] = React.useState<AgentCard[]>([]);
   const [activeAgent, setActiveAgent] = React.useState<AgentCard | null>(null);
   const [addAgentModalOpen, setAddAgentModalOpen] = React.useState<boolean>(false);
+
+  // Derive messages from tasks and pending message
+  const messages: Message[] = React.useMemo(() => {
+    const allMessages: Message[] = [];
+
+    for (const task of tasks) {
+      // Add messages from task history
+      if (task.history) {
+        allMessages.push(...task.history);
+      }
+
+      // Add the latest status message if it exists
+      if (task.status.message) {
+        allMessages.push(task.status.message);
+      }
+    }
+
+    // Add pending message for immediate display
+    if (pendingMessage) {
+      allMessages.push(pendingMessage);
+    }
+
+    return allMessages;
+  }, [tasks, pendingMessage]);
 
   const showToast = (
     message: string,
@@ -73,13 +106,15 @@ export default function Home() {
   };
 
   const handleAgentSelect = (agent: AgentCard): void => {
-    setMessages([]);
+    setTasks([]);
+    setPendingMessage(null);
+    setMessageText("");
     setTaskId(undefined);
     setContextId(undefined);
     setActiveAgent(agent);
   };
 
-  const handleSendMessage = async (messageText: string): Promise<void> => {
+  const handleSendMessage = async (messageTextToSend: string): Promise<void> => {
     if (!activeAgent) {
       showToast("Please add an agent", "warning");
 
@@ -87,15 +122,16 @@ export default function Home() {
     }
 
     setLoading(true);
+    setMessageText(""); // Clear the text field immediately on send
 
     try {
       const client: A2AClient = new A2AClient({ agentCard: activeAgent });
 
       // Create the message send params using the utility function
-      const messageSendParams = createMessageSendParamsObject(messageText, taskId, contextId);
+      const messageSendParams = createMessageSendParamsObject(messageTextToSend, taskId, contextId);
 
-      // Add the user's message to the messages array
-      setMessages((prev) => [...prev, messageSendParams.message]);
+      // Add the user's message to pending message for immediate display
+      setPendingMessage(messageSendParams.message);
 
       // Create the request
       const request: SendMessageRequest = {
@@ -105,38 +141,47 @@ export default function Home() {
       };
 
       // Send the message to the A2A agent
-      const response = await client.sendMessage(request);
+      const response: SendMessageResponse = await client.sendMessage(request);
 
       // Check if the response is successful
       if ("result" in response) {
-        const successResponse = response as SendMessageSuccessResponse;
-        const result = successResponse.result;
+        const successResponse: SendMessageSuccessResponse = response as SendMessageSuccessResponse;
+        const task: Task = successResponse.result as Task;
 
-        // Extract taskId and contextId for future messages
-        if (result.kind === "task") {
-          setTaskId(result.id);
-          setContextId(result.contextId);
+        // Clear pending message since we now have the task response
+        setPendingMessage(null);
 
-          if (result.status.message) {
-            setMessages((prev) => [...prev, result.status.message!]);
+        // Update taskId and contextId for future messages
+        setTaskId(task.id);
+        setContextId(task.contextId);
+
+        // Update or add the task to our tasks state
+        setTasks((prev) => {
+          const existingTaskIndex = prev.findIndex((existingTask) => existingTask.id === task.id);
+
+          if (existingTaskIndex === -1) {
+            // Add new task
+            return [...prev, task];
+          } else {
+            // Update existing task
+            const newTasks = [...prev];
+            newTasks[existingTaskIndex] = task;
+
+            return newTasks;
           }
-        } else if (result.kind === "message") {
-          if (result.taskId) {
-            setTaskId(result.taskId);
-          }
-
-          if (result.contextId) {
-            setContextId(result.contextId);
-          }
-
-          setMessages((prev) => [...prev, result]);
-        }
+        });
       } else {
         console.error("Error response from A2A agent:", response);
+        // Clear pending message and restore text field value on error
+        setPendingMessage(null);
+        setMessageText(messageTextToSend);
         showToast("Something went wrong processing your message. Please try again.", "error");
       }
     } catch (error) {
       console.error("Error sending message:", error);
+      // Clear pending message and restore text field value on error
+      setPendingMessage(null);
+      setMessageText(messageTextToSend);
       showToast("Something went wrong sending your message. Please try again.", "error");
     } finally {
       setLoading(false);
@@ -155,7 +200,13 @@ export default function Home() {
       <Toolbar />
 
       <Box sx={{ flex: 1 }}>
-        <Chat messages={messages} onSendMessage={handleSendMessage} loading={loading} />
+        <Chat
+          messages={messages}
+          onSendMessage={handleSendMessage}
+          loading={loading}
+          textFieldValue={messageText}
+          onTextFieldChange={setMessageText}
+        />
       </Box>
 
       <AddAgentModal
