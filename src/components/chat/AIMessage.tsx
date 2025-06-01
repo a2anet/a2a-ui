@@ -1,13 +1,17 @@
 import { Box } from "@mui/material";
 
-import { MessageTypography } from "@/components/chat/MessageTypography";
-import { Message } from "@/types";
+import { TextDataPartMarkdown } from "@/components/chat/TextDataPartMarkdown";
+import { DataPart, Message, TextPart } from "@/types";
 
 interface AIMessageProps {
   message: Message;
 }
 
 export const AIMessage: React.FC<AIMessageProps> = ({ message }) => {
+  const textDataParts: (TextPart | DataPart)[] = message.parts.filter(
+    (part) => part.kind === "text" || part.kind === "data"
+  );
+
   return (
     <Box
       sx={{
@@ -15,7 +19,9 @@ export const AIMessage: React.FC<AIMessageProps> = ({ message }) => {
         justifyContent: "flex-start",
       }}
     >
-      <MessageTypography message={message} />
+      {textDataParts.map((part, index) => (
+        <TextDataPartMarkdown key={index} part={part} />
+      ))}
     </Box>
   );
 };

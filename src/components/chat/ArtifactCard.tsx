@@ -1,8 +1,9 @@
 "use client";
 
-import { Box, Card, CardContent, Typography } from "@mui/material";
+import { Box, Card, CardContent, Divider, Typography } from "@mui/material";
 import React from "react";
 
+import { TextDataPartMarkdown } from "@/components/chat/TextDataPartMarkdown";
 import { Artifact, Part } from "@/types";
 
 interface ArtifactCardProps {
@@ -10,21 +11,10 @@ interface ArtifactCardProps {
 }
 
 const renderPart = (part: Part, index: number): React.ReactNode => {
-  switch (part.kind) {
-    case "text":
-      return (
-        <Typography key={index} sx={{ whiteSpace: "pre-wrap" }}>
-          {part.text}
-        </Typography>
-      );
-    case "data":
-      return (
-        <Typography key={index} sx={{ whiteSpace: "pre-wrap" }}>
-          {JSON.stringify(part.data, null, 4)}
-        </Typography>
-      );
-    default:
-      return null;
+  if (part.kind === "text" || part.kind === "data") {
+    return <TextDataPartMarkdown key={index} part={part} />;
+  } else {
+    return null;
   }
 };
 
@@ -34,20 +24,24 @@ export const ArtifactCard: React.FC<ArtifactCardProps> = ({ artifact }) => {
       elevation={0}
       sx={{ mb: 2, border: "1px solid", borderColor: "divider", borderRadius: 5 }}
     >
-      <CardContent>
-        {artifact.name && (
-          <Typography variant="h6" component="h3" gutterBottom>
-            {artifact.name}
-          </Typography>
-        )}
+      <CardContent sx={{ p: 0, "&:last-child": { pb: 0 } }}>
+        <Box sx={{ px: 2, pt: 2 }}>
+          {artifact.name && (
+            <Typography variant="h4" component="h3" gutterBottom>
+              {artifact.name}
+            </Typography>
+          )}
 
-        {artifact.description && (
-          <Typography color="text.secondary" sx={{ mb: 2 }}>
-            {artifact.description}
-          </Typography>
-        )}
+          {artifact.description && (
+            <Typography color="text.secondary" gutterBottom>
+              {artifact.description}
+            </Typography>
+          )}
+        </Box>
 
-        <Box>{artifact.parts.map((part, index) => renderPart(part, index))}</Box>
+        {(artifact.name || artifact.description) && <Divider sx={{ my: 2 }} />}
+
+        <Box sx={{ px: 2 }}>{artifact.parts.map((part, index) => renderPart(part, index))}</Box>
       </CardContent>
     </Card>
   );
