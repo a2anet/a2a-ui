@@ -66,21 +66,22 @@ export const Chat: React.FC<ChatProps> = ({
     <Box
       sx={{
         bgcolor: "background.default",
+        height: "100%",
+        overflow: "auto",
       }}
     >
-      {/* Messages Container */}
-      <Container maxWidth="md" sx={{ pt: 2, pb: 34 }}>
+      {/* Messages */}
+      {/* `ChatTextField` height */}
+      <Container maxWidth="md" sx={{ py: 2, minHeight: "calc(100% - 81px)" }}>
         {messages.map((item) => renderItem(item))}
         <div ref={messagesEndRef} />
       </Container>
 
-      {/* Fixed Input Container */}
+      {/* Chat Text Field */}
       <Box
         sx={{
-          position: "fixed",
+          position: "sticky",
           bottom: 0,
-          left: 0,
-          right: 0,
           bgcolor: "background.default",
           background:
             "linear-gradient(to top, var(--mui-palette-background-default) 50%, transparent 50%)",
