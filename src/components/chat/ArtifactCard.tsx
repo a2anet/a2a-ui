@@ -11,7 +11,13 @@ interface ArtifactCardProps {
 }
 
 const renderPart = (part: Part, index: number): React.ReactNode => {
-  if (part.kind === "text" || part.kind === "data") {
+  if (part.kind === "text") {
+    return (
+      <Box sx={{ pb: 2 }}>
+        <TextDataPartMarkdown key={index} part={part} />
+      </Box>
+    );
+  } else if (part.kind === "data") {
     return <TextDataPartMarkdown key={index} part={part} />;
   } else {
     return null;
