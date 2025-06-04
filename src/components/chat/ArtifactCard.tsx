@@ -26,10 +26,7 @@ const renderPart = (part: Part, index: number): React.ReactNode => {
 
 export const ArtifactCard: React.FC<ArtifactCardProps> = ({ artifact }) => {
   return (
-    <Card
-      elevation={0}
-      sx={{ mb: 2, border: "1px solid", borderColor: "divider", borderRadius: 5 }}
-    >
+    <Card elevation={0} sx={{ border: "1px solid", borderColor: "divider", borderRadius: 5 }}>
       <CardContent sx={{ p: 0, "&:last-child": { pb: 0 } }}>
         <Box sx={{ px: 2, pt: 2 }}>
           {artifact.name && (

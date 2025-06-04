@@ -12,7 +12,6 @@ import { A2AClient } from "@/lib/a2a/client/client";
 import { createMessageSendParamsObject } from "@/lib/utils";
 import {
   AgentCard,
-  Artifact,
   Message,
   SendMessageRequest,
   SendMessageResponse,
@@ -52,7 +51,11 @@ const Main = styled("main", { shouldForwardProp: (prop) => prop !== "open" })<{
 
 export default function Home() {
   const [contexts, setContexts] = React.useState<Context[]>([]);
-  const [activeContextId, setActiveContextId] = React.useState<string | undefined>(undefined);
+  const [selectedContextId, setSelectedContextId] = React.useState<string | undefined>(undefined);
+  const [selectedTaskId, setSelectedTaskId] = React.useState<string | undefined>(undefined);
+  const [selectedArtifactId, setSelectedArtifactId] = React.useState<string | undefined>(undefined);
+  const [scrollToTaskId, setScrollToTaskId] = React.useState<string | undefined>(undefined);
+  const [scrollToArtifactId, setScrollToArtifactId] = React.useState<string | undefined>(undefined);
   const [pendingMessage, setPendingMessage] = React.useState<Message | null>(null);
   const [messageText, setMessageText] = React.useState<string>("");
   const [loading, setLoading] = React.useState<boolean>(false);
@@ -77,8 +80,8 @@ export default function Home() {
 
   // Get the active context
   const activeContext: Context | undefined = React.useMemo(() => {
-    return contexts.find((context) => context.contextId === activeContextId);
-  }, [contexts, activeContextId]);
+    return contexts.find((context) => context.contextId === selectedContextId);
+  }, [contexts, selectedContextId]);
 
   // Get the active (non-terminal) task from the active context
   const activeTask: Task | undefined = React.useMemo(() => {
@@ -86,37 +89,6 @@ export default function Home() {
 
     return activeContext.tasks.find((task) => !terminalStates.includes(task.status.state));
   }, [activeContext, terminalStates]);
-
-  // Derive messages from the active context and pending message
-  const messages: (Message | Artifact)[] = React.useMemo(() => {
-    const allItems: (Message | Artifact)[] = [];
-
-    if (activeContext) {
-      for (const task of activeContext.tasks) {
-        // Add messages from task history
-        if (task.history) {
-          allItems.push(...task.history);
-        }
-
-        // Add the latest status message if it exists
-        if (task.status.message) {
-          allItems.push(task.status.message);
-        }
-
-        // Add artifacts if they exist
-        if (task.artifacts) {
-          allItems.push(...task.artifacts);
-        }
-      }
-    }
-
-    // Add pending message for immediate display
-    if (pendingMessage) {
-      allItems.push(pendingMessage);
-    }
-
-    return allItems;
-  }, [activeContext, pendingMessage]);
 
   const showToast = (
     message: string,
@@ -172,7 +144,11 @@ export default function Home() {
   };
 
   const handleNewChat = (): void => {
-    setActiveContextId(undefined);
+    setSelectedContextId(undefined);
+    setSelectedTaskId(undefined);
+    setSelectedArtifactId(undefined);
+    setScrollToTaskId(undefined);
+    setScrollToArtifactId(undefined);
     setPendingMessage(null);
     setMessageText("");
   };
@@ -181,11 +157,28 @@ export default function Home() {
     const context = contexts.find((ctx) => ctx.contextId === contextId);
 
     if (context) {
-      setActiveContextId(contextId);
       setActiveAgent(context.agent);
+      setSelectedContextId(contextId);
+      setSelectedTaskId(undefined);
+      setSelectedArtifactId(undefined);
+      setScrollToTaskId(undefined);
+      setScrollToArtifactId(undefined);
       setPendingMessage(null);
       setMessageText("");
     }
+  };
+
+  const handleTaskSelect = (taskId: string): void => {
+    setSelectedTaskId(taskId);
+    setSelectedArtifactId(undefined);
+    setScrollToTaskId(taskId);
+    setScrollToArtifactId(undefined);
+  };
+
+  const handleArtifactSelect = (artifactId: string): void => {
+    setSelectedArtifactId(artifactId);
+    setScrollToTaskId(undefined);
+    setScrollToArtifactId(artifactId);
   };
 
   const handleSendMessage = async (messageTextToSend: string): Promise<void> => {
@@ -242,7 +235,7 @@ export default function Home() {
               tasks: [task],
             };
 
-            setActiveContextId(task.contextId);
+            setSelectedContextId(task.contextId);
 
             return [...prev, newContext];
           } else {
@@ -308,8 +301,12 @@ export default function Home() {
       <Sidebar
         open={sidebarOpen}
         contexts={contexts}
-        activeContextId={activeContextId}
+        selectedContextId={selectedContextId}
+        selectedTaskId={selectedTaskId}
+        selectedArtifactId={selectedArtifactId}
         onContextSelect={handleContextSelect}
+        onTaskSelect={handleTaskSelect}
+        onArtifactSelect={handleArtifactSelect}
         onNewChat={handleNewChat}
         onClose={handleSidebarClose}
       />
@@ -327,7 +324,14 @@ export default function Home() {
           }}
         >
           <Chat
-            messages={messages}
+            context={activeContext}
+            pendingMessage={pendingMessage}
+            scrollToTaskId={scrollToTaskId}
+            scrollToArtifactId={scrollToArtifactId}
+            onScrollComplete={() => {
+              setScrollToTaskId(undefined);
+              setScrollToArtifactId(undefined);
+            }}
             onSendMessage={handleSendMessage}
             loading={loading}
             textFieldValue={messageText}

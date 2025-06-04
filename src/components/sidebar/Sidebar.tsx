@@ -15,15 +15,19 @@ import { styled } from "@mui/material/styles";
 import React from "react";
 
 import { Context } from "@/app/page";
-import { TaskState } from "@/types";
+import { Task, TaskState } from "@/types";
 
 export const drawerWidth = 300;
 
 interface SidebarProps {
   open: boolean;
   contexts: Context[];
-  activeContextId: string | undefined;
+  selectedContextId: string | undefined;
+  selectedTaskId: string | undefined;
+  selectedArtifactId: string | undefined;
   onContextSelect: (contextId: string) => void;
+  onTaskSelect: (taskId: string) => void;
+  onArtifactSelect: (artifactId: string) => void;
   onNewChat: () => void;
   onClose: () => void;
 }
@@ -39,8 +43,12 @@ const DrawerHeader = styled("div")(({ theme }) => ({
 export const Sidebar: React.FC<SidebarProps> = ({
   open,
   contexts,
-  activeContextId,
+  selectedContextId,
+  selectedTaskId,
+  selectedArtifactId,
   onContextSelect,
+  onTaskSelect,
+  onArtifactSelect,
   onNewChat,
   onClose,
 }) => {
@@ -68,6 +76,14 @@ export const Sidebar: React.FC<SidebarProps> = ({
         return "Unknown";
     }
   };
+
+  const selectedContext: Context | undefined = contexts.find(
+    (context) => context.contextId === selectedContextId
+  );
+  const selectedTask: Task | undefined =
+    selectedContext && selectedTaskId
+      ? selectedContext.tasks.find((task) => task.id === selectedTaskId)
+      : undefined;
 
   return (
     <Drawer
@@ -113,13 +129,13 @@ export const Sidebar: React.FC<SidebarProps> = ({
       </Box>
 
       <Box sx={{ flex: 1, overflow: "auto" }}>
-        {contexts.length > 0 && (
+        {contexts && contexts.length > 0 && (
           <>
             <List subheader={<ListSubheader>Contexts</ListSubheader>}>
               {contexts.map((context) => (
                 <ListItem key={context.contextId} disablePadding>
                   <ListItemButton
-                    selected={activeContextId === context.contextId}
+                    selected={selectedContextId === context.contextId}
                     onClick={() => onContextSelect(context.contextId)}
                   >
                     <ListItemText
@@ -135,12 +151,14 @@ export const Sidebar: React.FC<SidebarProps> = ({
               ))}
             </List>
 
-            <List subheader={<ListSubheader>Tasks</ListSubheader>}>
-              {contexts
-                .find((context) => context.contextId === activeContextId)
-                ?.tasks.map((task) => (
+            {selectedContext && selectedContext.tasks && selectedContext.tasks.length > 0 && (
+              <List subheader={<ListSubheader>Tasks</ListSubheader>}>
+                {selectedContext.tasks.map((task) => (
                   <ListItem key={task.id} disablePadding>
-                    <ListItemButton>
+                    <ListItemButton
+                      selected={selectedTaskId === task.id}
+                      onClick={() => onTaskSelect(task.id)}
+                    >
                       <ListItemText
                         primary={
                           <Typography variant="body2" noWrap>
@@ -152,7 +170,30 @@ export const Sidebar: React.FC<SidebarProps> = ({
                     </ListItemButton>
                   </ListItem>
                 ))}
-            </List>
+              </List>
+            )}
+
+            {selectedTask && selectedTask.artifacts && selectedTask.artifacts.length > 0 && (
+              <List subheader={<ListSubheader>Artifacts</ListSubheader>}>
+                {selectedTask.artifacts.map((artifact) => (
+                  <ListItem key={artifact.artifactId} disablePadding>
+                    <ListItemButton
+                      selected={selectedArtifactId === artifact.artifactId}
+                      onClick={() => onArtifactSelect(artifact.artifactId)}
+                    >
+                      <ListItemText
+                        primary={
+                          <Typography variant="body2" noWrap>
+                            {artifact.artifactId}
+                          </Typography>
+                        }
+                        secondary={artifact.name}
+                      />
+                    </ListItemButton>
+                  </ListItem>
+                ))}
+              </List>
+            )}
           </>
         )}
       </Box>
