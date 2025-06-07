@@ -1,13 +1,17 @@
-import { Box, Paper } from "@mui/material";
+import { Box, Paper, Typography } from "@mui/material";
 
-import { MessageTypography } from "@/components/chat/MessageTypography";
-import { Message } from "@/lib/a2a/types";
+import { Message, Part, TextPart } from "@/lib/a2a/types";
 
 interface UserMessageProps {
   message: Message;
 }
 
 export const UserMessage: React.FC<UserMessageProps> = ({ message }) => {
+  const textParts: string = message.parts
+    .filter((part: Part) => part.kind === "text")
+    .map((part: TextPart) => part.text)
+    .join(" ");
+
   return (
     <Box
       sx={{
@@ -24,7 +28,13 @@ export const UserMessage: React.FC<UserMessageProps> = ({ message }) => {
           borderRadius: 5,
         }}
       >
-        <MessageTypography message={message} />
+        <Typography
+          sx={{
+            whiteSpace: "pre-wrap",
+          }}
+        >
+          {textParts}
+        </Typography>
       </Paper>
     </Box>
   );
