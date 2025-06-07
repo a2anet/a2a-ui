@@ -14,14 +14,14 @@ import {
 import { styled } from "@mui/material/styles";
 import React from "react";
 
-import { Context } from "@/app/page";
+import { ChatContext } from "@/hooks/useContextManager";
 import { Task, TaskState } from "@/types";
 
 export const drawerWidth = 300;
 
 interface SidebarProps {
   open: boolean;
-  contexts: Context[];
+  contexts: ChatContext[];
   selectedContextId: string | undefined;
   selectedTaskId: string | undefined;
   selectedArtifactId: string | undefined;
@@ -54,8 +54,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
 }) => {
   const getTaskStateText = (state: TaskState): string => {
     switch (state) {
-      case TaskState.Completed:
-        return "Completed";
+      case TaskState.Submitted:
+        return "Submitted";
       case TaskState.Working:
         return "Working";
       case TaskState.InputRequired:
@@ -77,7 +77,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
     }
   };
 
-  const selectedContext: Context | undefined = contexts.find(
+  const selectedContext: ChatContext | undefined = contexts.find(
     (context) => context.contextId === selectedContextId
   );
   const selectedTask: Task | undefined =
@@ -132,7 +132,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
         {contexts && contexts.length > 0 && (
           <>
             <List subheader={<ListSubheader>Contexts</ListSubheader>}>
-              {contexts.map((context) => (
+              {contexts.toReversed().map((context) => (
                 <ListItem key={context.contextId} disablePadding>
                   <ListItemButton
                     selected={selectedContextId === context.contextId}

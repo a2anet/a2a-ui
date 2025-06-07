@@ -7,6 +7,7 @@ interface ChatTextFieldProps {
   loading?: boolean;
   value: string;
   onChange: (value: string) => void;
+  autoFocus?: boolean;
 }
 
 export const ChatTextField: React.FC<ChatTextFieldProps> = ({
@@ -14,7 +15,10 @@ export const ChatTextField: React.FC<ChatTextFieldProps> = ({
   loading = false,
   value,
   onChange,
+  autoFocus = false,
 }) => {
+  const inputRef = React.useRef<HTMLInputElement>(null);
+
   const handleSend = (): void => {
     if (value.trim() && !loading) {
       onSendMessage(value.trim());
@@ -32,8 +36,16 @@ export const ChatTextField: React.FC<ChatTextFieldProps> = ({
     }
   };
 
+  // Focus the text field when autoFocus changes to true
+  React.useEffect(() => {
+    if (autoFocus && inputRef.current) {
+      inputRef.current.focus();
+    }
+  }, [autoFocus]);
+
   return (
     <TextField
+      inputRef={inputRef}
       value={value}
       onChange={handleChange}
       onKeyDown={handleKeyPress}

@@ -3,12 +3,12 @@
 import { Box, Container } from "@mui/material";
 import React from "react";
 
-import { Context } from "@/app/page";
 import { AIMessage } from "@/components/chat/AIMessage";
 import { ArtifactCard } from "@/components/chat/ArtifactCard";
 import { ChatTextField } from "@/components/chat/ChatTextField";
 import { TaskDivider } from "@/components/chat/TaskDivider";
 import { UserMessage } from "@/components/chat/UserMessage";
+import { ChatContext } from "@/hooks/useContextManager";
 import { Artifact, Message } from "@/types";
 
 interface TaskDividerItem {
@@ -19,27 +19,25 @@ interface TaskDividerItem {
 type ChatItem = Message | Artifact | TaskDividerItem;
 
 interface ChatProps {
-  context?: Context;
-  pendingMessage: Message | null;
+  context?: ChatContext;
   scrollToTaskId?: string;
   scrollToArtifactId?: string;
   onScrollComplete: () => void;
   onSendMessage: (message: string) => void;
-  loading: boolean;
-  textFieldValue: string;
   onTextFieldChange: (value: string) => void;
+  currentMessageText?: string;
+  autoFocus?: boolean;
 }
 
 export const Chat: React.FC<ChatProps> = ({
   context,
-  pendingMessage,
   scrollToTaskId,
   scrollToArtifactId,
   onScrollComplete,
   onSendMessage,
-  loading,
-  textFieldValue,
   onTextFieldChange,
+  currentMessageText,
+  autoFocus = false,
 }) => {
   const messagesEndRef = React.useRef<HTMLDivElement>(null);
   const taskRefs = React.useRef<Map<string, HTMLDivElement>>(new Map());
@@ -72,15 +70,15 @@ export const Chat: React.FC<ChatProps> = ({
           chatItems2.push(...task.artifacts);
         }
       }
-    }
 
-    // Add pending message for immediate display
-    if (pendingMessage) {
-      chatItems2.push(pendingMessage);
+      // Add pending message for immediate display
+      if (context.pendingMessage) {
+        chatItems2.push(context.pendingMessage);
+      }
     }
 
     return chatItems2;
-  }, [context, pendingMessage]);
+  }, [context]);
 
   const handleSendMessage = (message: string): void => {
     onSendMessage(message);
@@ -198,9 +196,10 @@ export const Chat: React.FC<ChatProps> = ({
         <Container maxWidth="md">
           <ChatTextField
             onSendMessage={handleSendMessage}
-            loading={loading}
-            value={textFieldValue}
+            loading={context?.loading}
+            value={currentMessageText || ""}
             onChange={onTextFieldChange}
+            autoFocus={autoFocus}
           />
         </Container>
       </Box>

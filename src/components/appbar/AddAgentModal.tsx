@@ -1,7 +1,6 @@
 import {
   Box,
   Button,
-  CircularProgress,
   Dialog,
   DialogActions,
   DialogContent,
@@ -101,8 +100,13 @@ export const AddAgentModal: React.FC<AddAgentModalProps> = ({
           Cancel
         </Button>
 
-        <Button onClick={handleAddAgent} disabled={!url.trim() || loading} variant="contained">
-          {loading ? <CircularProgress size={16} /> : "Add Agent"}
+        <Button
+          onClick={handleAddAgent}
+          disabled={!url.trim()}
+          loading={loading}
+          variant="contained"
+        >
+          Add Agent
         </Button>
       </DialogActions>
     </Dialog>

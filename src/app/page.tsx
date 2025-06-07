@@ -1,6 +1,6 @@
 "use client";
 
-import { Alert, Box, Snackbar, Toolbar } from "@mui/material";
+import { Box, Toolbar } from "@mui/material";
 import { styled } from "@mui/material/styles";
 import React from "react";
 
@@ -8,23 +8,10 @@ import { AddAgentModal } from "@/components/appbar/AddAgentModal";
 import { AppBar } from "@/components/appbar/AppBar";
 import { Chat } from "@/components/chat/Chat";
 import { Sidebar, drawerWidth } from "@/components/sidebar/Sidebar";
-import { A2AClient } from "@/lib/a2a/client/client";
-import { createMessageSendParamsObject } from "@/lib/utils";
-import {
-  AgentCard,
-  Message,
-  SendMessageRequest,
-  SendMessageResponse,
-  SendMessageSuccessResponse,
-  Task,
-  TaskState,
-} from "@/types";
-
-export interface Context {
-  contextId: string;
-  agent: AgentCard;
-  tasks: Task[];
-}
+import { useToastContext } from "@/contexts/ToastContext";
+import { useAgentManager } from "@/hooks/useAgentManager";
+import { useContextManager } from "@/hooks/useContextManager";
+import { AgentCard } from "@/types";
 
 const Main = styled("main", { shouldForwardProp: (prop) => prop !== "open" })<{
   open?: boolean;
@@ -50,231 +37,71 @@ const Main = styled("main", { shouldForwardProp: (prop) => prop !== "open" })<{
 }));
 
 export default function Home() {
-  const [contexts, setContexts] = React.useState<Context[]>([]);
-  const [selectedContextId, setSelectedContextId] = React.useState<string | undefined>(undefined);
-  const [selectedTaskId, setSelectedTaskId] = React.useState<string | undefined>(undefined);
-  const [selectedArtifactId, setSelectedArtifactId] = React.useState<string | undefined>(undefined);
-  const [scrollToTaskId, setScrollToTaskId] = React.useState<string | undefined>(undefined);
-  const [scrollToArtifactId, setScrollToArtifactId] = React.useState<string | undefined>(undefined);
-  const [pendingMessage, setPendingMessage] = React.useState<Message | null>(null);
-  const [messageText, setMessageText] = React.useState<string>("");
-  const [loading, setLoading] = React.useState<boolean>(false);
-  const [toastOpen, setToastOpen] = React.useState<boolean>(false);
-  const [toastMessage, setToastMessage] = React.useState<string>("");
-  const [toastSeverity, setToastSeverity] = React.useState<
-    "error" | "warning" | "info" | "success"
-  >("error");
-  const [agents, setAgents] = React.useState<AgentCard[]>([]);
-  const [activeAgent, setActiveAgent] = React.useState<AgentCard | null>(null);
   const [addAgentModalOpen, setAddAgentModalOpen] = React.useState<boolean>(false);
   const [sidebarOpen, setSidebarOpen] = React.useState<boolean>(true);
+  const [newChatMessageText, setNewChatMessageText] = React.useState<string>("");
+  const [shouldAutoFocus, setShouldAutoFocus] = React.useState<boolean>(false);
 
-  // Terminal states that should reset tasks
-  const terminalStates: TaskState[] = [
-    TaskState.Completed,
-    TaskState.Canceled,
-    TaskState.Failed,
-    TaskState.Rejected,
-    TaskState.Unknown,
-  ];
-
-  // Get the active context
-  const activeContext: Context | undefined = React.useMemo(() => {
-    return contexts.find((context) => context.contextId === selectedContextId);
-  }, [contexts, selectedContextId]);
-
-  // Get the active (non-terminal) task from the active context
-  const activeTask: Task | undefined = React.useMemo(() => {
-    if (!activeContext) return undefined;
-
-    return activeContext.tasks.find((task) => !terminalStates.includes(task.status.state));
-  }, [activeContext, terminalStates]);
-
-  const showToast = (
-    message: string,
-    severity: "error" | "warning" | "info" | "success" = "error"
-  ): void => {
-    setToastMessage(message);
-    setToastSeverity(severity);
-    setToastOpen(true);
-  };
-
-  const handleToastClose = (event?: React.SyntheticEvent | Event, reason?: string): void => {
-    if (reason === "clickaway") {
-      return;
-    }
-
-    setToastOpen(false);
-  };
-
-  const handleAgentAdded = (agent: AgentCard): void => {
-    setAgents((prev) => {
-      // Check if agent already exists
-      const existingIndex = prev.findIndex((existingAgent) => existingAgent.url === agent.url);
-
-      if (existingIndex !== -1) {
-        // Replace the existing agent
-        const newAgents = [...prev];
-        newAgents[existingIndex] = agent;
-
-        // Update active agent if we're replacing the currently active one
-        if (activeAgent?.url === agent.url) {
-          setActiveAgent(agent);
-        }
-
-        return newAgents;
-      } else {
-        const newAgents = [...prev, agent];
-
-        // Set as active agent if it's the first one
-        if (prev.length === 0) {
-          setActiveAgent(agent);
-        }
-
-        showToast(`Added ${agent.name}`, "success");
-
-        return newAgents;
-      }
-    });
-  };
+  // Use custom hooks for managing state
+  const { showToast } = useToastContext();
+  const agentManager = useAgentManager({ showToast });
+  const contextManager = useContextManager({ showToast });
 
   const handleAgentSelect = (agent: AgentCard): void => {
-    setActiveAgent(agent);
-    handleNewChat();
+    agentManager.handleAgentSelect(agent);
+    contextManager.handleNewChat();
+    setNewChatMessageText("");
+    setShouldAutoFocus(true);
   };
 
   const handleNewChat = (): void => {
-    setSelectedContextId(undefined);
-    setSelectedTaskId(undefined);
-    setSelectedArtifactId(undefined);
-    setScrollToTaskId(undefined);
-    setScrollToArtifactId(undefined);
-    setPendingMessage(null);
-    setMessageText("");
+    contextManager.handleNewChat();
+    setNewChatMessageText("");
+    setShouldAutoFocus(true);
   };
 
   const handleContextSelect = (contextId: string): void => {
-    const context = contexts.find((ctx) => ctx.contextId === contextId);
+    const context = contextManager.contexts.find((ctx) => ctx.contextId === contextId);
 
     if (context) {
-      setActiveAgent(context.agent);
-      setSelectedContextId(contextId);
-      setSelectedTaskId(undefined);
-      setSelectedArtifactId(undefined);
-      setScrollToTaskId(undefined);
-      setScrollToArtifactId(undefined);
-      setPendingMessage(null);
-      setMessageText("");
+      agentManager.setActiveAgent(context.agent);
+      contextManager.handleContextSelect(contextId);
+      setNewChatMessageText("");
+      setShouldAutoFocus(true);
     }
   };
 
-  const handleTaskSelect = (taskId: string): void => {
-    setSelectedTaskId(taskId);
-    setSelectedArtifactId(undefined);
-    setScrollToTaskId(taskId);
-    setScrollToArtifactId(undefined);
-  };
-
-  const handleArtifactSelect = (artifactId: string): void => {
-    setSelectedArtifactId(artifactId);
-    setScrollToTaskId(undefined);
-    setScrollToArtifactId(artifactId);
-  };
-
-  const handleSendMessage = async (messageTextToSend: string): Promise<void> => {
-    if (!activeAgent) {
+  const handleSendMessage = async (messageText: string): Promise<void> => {
+    if (!agentManager.activeAgent) {
       showToast("Please add an agent", "warning");
       return;
     }
 
-    setLoading(true);
-    setMessageText(""); // Clear the text field immediately on send
+    // Clear the message text immediately when sending
+    if (contextManager.selectedContextId && contextManager.activeContext) {
+      contextManager.updateMessageText(contextManager.selectedContextId, "");
+    } else {
+      setNewChatMessageText("");
+    }
 
     try {
-      const client: A2AClient = new A2AClient({ agentCard: activeAgent });
-
-      // Get the current task ID and context ID for message sending
-      const taskId = activeTask?.id;
-      const contextId = activeContext?.contextId;
-
-      // Create the message send params using the utility function
-      const messageSendParams = createMessageSendParamsObject(messageTextToSend, taskId, contextId);
-
-      // Add the user's message to pending message for immediate display
-      setPendingMessage(messageSendParams.message);
-
-      // Create the request
-      const request: SendMessageRequest = {
-        jsonrpc: "2.0",
-        method: "message/send",
-        params: messageSendParams,
-      };
-
-      // Send the message to the A2A agent
-      const response: SendMessageResponse = await client.sendMessage(request);
-
-      // Check if the response is successful
-      if ("result" in response) {
-        const successResponse: SendMessageSuccessResponse = response as SendMessageSuccessResponse;
-        const task: Task = successResponse.result as Task;
-
-        // Clear pending message since we now have the task response
-        setPendingMessage(null);
-
-        // Update or create context and add/update the task
-        setContexts((prev) => {
-          const existingContextIndex = prev.findIndex(
-            (context) => context.contextId === task.contextId
-          );
-
-          if (existingContextIndex === -1) {
-            // Create new context
-            const newContext: Context = {
-              contextId: task.contextId,
-              agent: activeAgent,
-              tasks: [task],
-            };
-
-            setSelectedContextId(task.contextId);
-
-            return [...prev, newContext];
-          } else {
-            // Update existing context
-            const newContexts = [...prev];
-            const existingContext = newContexts[existingContextIndex];
-
-            const existingTaskIndex = existingContext.tasks.findIndex(
-              (existingTask) => existingTask.id === task.id
-            );
-
-            if (existingTaskIndex === -1) {
-              // Add new task to existing context
-              existingContext.tasks = [...existingContext.tasks, task];
-            } else {
-              // Update existing task
-              const newTasks = [...existingContext.tasks];
-              newTasks[existingTaskIndex] = task;
-              existingContext.tasks = newTasks;
-            }
-
-            return newContexts;
-          }
-        });
-      } else {
-        console.error("Error response from A2A agent:", response);
-        // Clear pending message and restore text field value on error
-        setPendingMessage(null);
-        setMessageText(messageTextToSend);
-        showToast("Something went wrong processing your message. Please try again.", "error");
-      }
+      await contextManager.handleSendMessage(messageText, agentManager.activeAgent);
     } catch (error) {
-      console.error("Error sending message:", error);
-      // Clear pending message and restore text field value on error
-      setPendingMessage(null);
-      setMessageText(messageTextToSend);
-      showToast("Something went wrong sending your message. Please try again.", "error");
-    } finally {
-      setLoading(false);
+      // If sending fails, restore the message text
+      if (contextManager.selectedContextId && contextManager.activeContext) {
+        contextManager.updateMessageText(contextManager.selectedContextId, messageText);
+      } else {
+        setNewChatMessageText(messageText);
+      }
+    }
+  };
+
+  const handleMessageTextChange = (messageText: string): void => {
+    if (contextManager.selectedContextId && contextManager.activeContext) {
+      contextManager.updateMessageText(contextManager.selectedContextId, messageText);
+    } else {
+      // For new chats, store the text locally until a context is created
+      setNewChatMessageText(messageText);
     }
   };
 
@@ -286,11 +113,29 @@ export default function Home() {
     setSidebarOpen(false);
   };
 
+  // Focus text field on initial mount
+  React.useEffect(() => {
+    setShouldAutoFocus(true);
+  }, []);
+
+  // Reset auto-focus after it's been applied
+  React.useEffect(() => {
+    if (shouldAutoFocus) {
+      const timer = setTimeout(() => {
+        setShouldAutoFocus(false);
+      }, 100);
+      return () => clearTimeout(timer);
+    }
+  }, [shouldAutoFocus]);
+
+  // Get the current message text (either from active context or new chat)
+  const currentMessageText = contextManager.activeContext?.messageText || newChatMessageText;
+
   return (
     <Box sx={{ display: "flex" }}>
       <AppBar
-        agents={agents}
-        activeAgent={activeAgent}
+        agents={agentManager.agents}
+        activeAgent={agentManager.activeAgent}
         sidebarOpen={sidebarOpen}
         onAgentSelect={handleAgentSelect}
         onAddAgent={() => setAddAgentModalOpen(true)}
@@ -300,13 +145,13 @@ export default function Home() {
 
       <Sidebar
         open={sidebarOpen}
-        contexts={contexts}
-        selectedContextId={selectedContextId}
-        selectedTaskId={selectedTaskId}
-        selectedArtifactId={selectedArtifactId}
+        contexts={contextManager.contexts}
+        selectedContextId={contextManager.selectedContextId}
+        selectedTaskId={contextManager.selectedTaskId}
+        selectedArtifactId={contextManager.selectedArtifactId}
         onContextSelect={handleContextSelect}
-        onTaskSelect={handleTaskSelect}
-        onArtifactSelect={handleArtifactSelect}
+        onTaskSelect={contextManager.handleTaskSelect}
+        onArtifactSelect={contextManager.handleArtifactSelect}
         onNewChat={handleNewChat}
         onClose={handleSidebarClose}
       />
@@ -324,18 +169,14 @@ export default function Home() {
           }}
         >
           <Chat
-            context={activeContext}
-            pendingMessage={pendingMessage}
-            scrollToTaskId={scrollToTaskId}
-            scrollToArtifactId={scrollToArtifactId}
-            onScrollComplete={() => {
-              setScrollToTaskId(undefined);
-              setScrollToArtifactId(undefined);
-            }}
+            context={contextManager.activeContext}
+            scrollToTaskId={contextManager.scrollToTaskId}
+            scrollToArtifactId={contextManager.scrollToArtifactId}
+            onScrollComplete={contextManager.onScrollComplete}
             onSendMessage={handleSendMessage}
-            loading={loading}
-            textFieldValue={messageText}
-            onTextFieldChange={setMessageText}
+            onTextFieldChange={handleMessageTextChange}
+            currentMessageText={currentMessageText}
+            autoFocus={shouldAutoFocus}
           />
         </Box>
       </Main>
@@ -343,25 +184,9 @@ export default function Home() {
       <AddAgentModal
         open={addAgentModalOpen}
         onClose={() => setAddAgentModalOpen(false)}
-        onAgentAdded={handleAgentAdded}
+        onAgentAdded={agentManager.handleAgentAdded}
         onError={(message) => showToast(message, "error")}
       />
-
-      <Snackbar
-        open={toastOpen}
-        onClose={handleToastClose}
-        autoHideDuration={5000}
-        anchorOrigin={{ vertical: "top", horizontal: "center" }}
-      >
-        <Alert
-          onClose={handleToastClose}
-          severity={toastSeverity}
-          variant="filled"
-          sx={{ width: "100%" }}
-        >
-          {toastMessage}
-        </Alert>
-      </Snackbar>
     </Box>
   );
 }

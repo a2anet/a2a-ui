@@ -1,3 +1,4 @@
+import { ToastProvider } from "@/contexts/ToastContext";
 import theme from "@/theme";
 import { AppRouterCacheProvider } from "@mui/material-nextjs/v15-appRouter";
 import CssBaseline from "@mui/material/CssBaseline";
@@ -14,7 +15,7 @@ export default function RootLayout(props: { children: React.ReactNode }) {
           <ThemeProvider theme={theme}>
             {/* CssBaseline kickstart an elegant, consistent, and simple baseline to build upon. */}
             <CssBaseline />
-            {props.children}
+            <ToastProvider>{props.children}</ToastProvider>
           </ThemeProvider>
         </AppRouterCacheProvider>
       </body>
