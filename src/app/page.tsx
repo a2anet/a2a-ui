@@ -11,7 +11,7 @@ import { Sidebar, drawerWidth } from "@/components/sidebar/Sidebar";
 import { useToastContext } from "@/contexts/ToastContext";
 import { useAgentManager } from "@/hooks/useAgentManager";
 import { useContextManager } from "@/hooks/useContextManager";
-import { AgentCard } from "@/types";
+import { AgentCard } from "@/lib/a2a/types";
 
 const Main = styled("main", { shouldForwardProp: (prop) => prop !== "open" })<{
   open?: boolean;

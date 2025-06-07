@@ -1,7 +1,7 @@
 import { Box } from "@mui/material";
 
 import { TextDataPartMarkdown } from "@/components/chat/TextDataPartMarkdown";
-import { DataPart, Message, TextPart } from "@/types";
+import { DataPart, Message, TextPart } from "@/lib/a2a/types";
 
 interface AIMessageProps {
   message: Message;

@@ -1,6 +1,6 @@
 import { Typography } from "@mui/material";
 
-import { Message, Part, TextPart } from "@/types";
+import { Message, Part, TextPart } from "@/lib/a2a/types";
 
 interface MessageTypographyProps {
   message: Message;

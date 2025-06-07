@@ -12,7 +12,7 @@ import {
   SendStreamingMessageResponse,
   SetTaskPushNotificationConfigRequest,
   SetTaskPushNotificationConfigResponse,
-} from "../../../types";
+} from "../types";
 import { generateUUID } from "../utils";
 import { A2AClientHTTPError, A2AClientJSONError } from "./errors";
 

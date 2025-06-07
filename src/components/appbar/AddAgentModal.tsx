@@ -11,7 +11,7 @@ import {
 import React from "react";
 
 import { A2ACardResolver } from "@/lib/a2a/client/client";
-import { AgentCard } from "@/types";
+import { AgentCard } from "@/lib/a2a/types";
 
 interface AddAgentModalProps {
   open: boolean;

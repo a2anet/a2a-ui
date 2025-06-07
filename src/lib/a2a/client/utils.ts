@@ -2,7 +2,7 @@
  * Helper functions for the A2A client.
  */
 
-import { Message, TextPart } from "../../../types";
+import { Message, TextPart } from "../types";
 import { generateUUID } from "../utils";
 
 /**

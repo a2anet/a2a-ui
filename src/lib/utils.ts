@@ -1,5 +1,5 @@
 import { createTextMessageObject } from "@/lib/a2a/client/utils";
-import { Message, MessageSendParams } from "@/types";
+import { Message, MessageSendParams } from "@/lib/a2a/types";
 
 /**
  * Create a MessageSendParams object.

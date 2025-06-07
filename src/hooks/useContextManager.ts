@@ -1,8 +1,6 @@
 import React from "react";
 
 import { A2AClient } from "@/lib/a2a/client/client";
-import { generateUUID } from "@/lib/a2a/utils";
-import { createMessageSendParamsObject } from "@/lib/utils";
 import {
   AgentCard,
   Message,
@@ -11,7 +9,9 @@ import {
   SendMessageSuccessResponse,
   Task,
   TaskState,
-} from "@/types";
+} from "@/lib/a2a/types";
+import { generateUUID } from "@/lib/a2a/utils";
+import { createMessageSendParamsObject } from "@/lib/utils";
 
 export interface ChatContext {
   contextId: string;

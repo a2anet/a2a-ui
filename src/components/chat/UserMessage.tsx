@@ -1,7 +1,7 @@
 import { Box, Paper } from "@mui/material";
 
 import { MessageTypography } from "@/components/chat/MessageTypography";
-import { Message } from "@/types";
+import { Message } from "@/lib/a2a/types";
 
 interface UserMessageProps {
   message: Message;

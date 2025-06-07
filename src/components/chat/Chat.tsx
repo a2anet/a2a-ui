@@ -9,7 +9,7 @@ import { ChatTextField } from "@/components/chat/ChatTextField";
 import { TaskDivider } from "@/components/chat/TaskDivider";
 import { UserMessage } from "@/components/chat/UserMessage";
 import { ChatContext } from "@/hooks/useContextManager";
-import { Artifact, Message } from "@/types";
+import { Artifact, Message } from "@/lib/a2a/types";
 
 interface TaskDividerItem {
   kind: "task-divider";

@@ -15,7 +15,7 @@ import { styled } from "@mui/material/styles";
 import React from "react";
 
 import { ChatContext } from "@/hooks/useContextManager";
-import { Task, TaskState } from "@/types";
+import { Task, TaskState } from "@/lib/a2a/types";
 
 export const drawerWidth = 300;
 
