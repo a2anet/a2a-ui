@@ -97,10 +97,19 @@ export const useContextManager = ({
 
   const handleContextSelect = (contextId: string): void => {
     setSelectedContextId(contextId);
-    setSelectedTaskId(undefined);
     setSelectedArtifactId(undefined);
     setScrollToTaskId(undefined);
     setScrollToArtifactId(undefined);
+
+    // Find the context and select its most recent task
+    const context: ChatContext | undefined = contexts.find((ctx) => ctx.contextId === contextId);
+
+    if (context && context.tasks.length > 0) {
+      // Select the most recent task (last in the array)
+      const mostRecentTask = context.tasks[context.tasks.length - 1];
+      setSelectedTaskId(mostRecentTask.id);
+      setSelectedArtifactId(undefined);
+    }
   };
 
   const handleTaskSelect = (taskId: string): void => {
@@ -185,6 +194,9 @@ export const useContextManager = ({
           tasks: activeContext ? [...(activeContext.tasks || []), tempTask] : [tempTask],
           pendingMessage: null,
         });
+
+        // Select the new task
+        setSelectedTaskId(taskId);
       } else {
         // For existing tasks, just add the pending message
         updateContext(contextId!, { pendingMessage: messageSendParams.message });
@@ -281,6 +293,11 @@ export const useContextManager = ({
           });
         }
 
+        if (isNewTask) {
+          setSelectedTaskId(undefined);
+          setSelectedArtifactId(undefined);
+        }
+
         showToast("Something went wrong processing your message. Please try again.", "error");
         throw new Error("Message processing failed");
       }
@@ -298,6 +315,11 @@ export const useContextManager = ({
           messageText: messageText,
           loading: false,
         });
+      }
+
+      if (isNewTask) {
+        setSelectedTaskId(undefined);
+        setSelectedArtifactId(undefined);
       }
 
       showToast("Something went wrong sending your message. Please try again.", "error");

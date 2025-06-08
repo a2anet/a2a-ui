@@ -17,7 +17,7 @@ import React from "react";
 import { ChatContext } from "@/hooks/useContextManager";
 import { Task, TaskState } from "@/lib/a2a/types";
 
-export const drawerWidth = 300;
+export const drawerWidth = 280;
 
 interface SidebarProps {
   open: boolean;
@@ -107,7 +107,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
         </IconButton>
       </DrawerHeader>
 
-      <Box sx={{ p: 2 }}>
+      <Box sx={{ p: 1 }}>
         <Button
           onClick={onNewChat}
           variant="outlined"
@@ -133,10 +133,23 @@ export const Sidebar: React.FC<SidebarProps> = ({
           <>
             <List subheader={<ListSubheader>Contexts</ListSubheader>}>
               {contexts.toReversed().map((context) => (
-                <ListItem key={context.contextId} disablePadding>
+                <ListItem key={context.contextId} disablePadding sx={{ px: 1 }}>
                   <ListItemButton
                     selected={selectedContextId === context.contextId}
                     onClick={() => onContextSelect(context.contextId)}
+                    sx={{
+                      borderRadius: 3,
+                      bgcolor: "background.paper",
+                      "&:hover": {
+                        bgcolor: "action.hover",
+                      },
+                      "&.Mui-selected": {
+                        bgcolor: "action.selected",
+                        "&:hover": {
+                          bgcolor: "action.selected",
+                        },
+                      },
+                    }}
                   >
                     <ListItemText
                       primary={
@@ -154,10 +167,23 @@ export const Sidebar: React.FC<SidebarProps> = ({
             {selectedContext && selectedContext.tasks && selectedContext.tasks.length > 0 && (
               <List subheader={<ListSubheader>Tasks</ListSubheader>}>
                 {selectedContext.tasks.map((task) => (
-                  <ListItem key={task.id} disablePadding>
+                  <ListItem key={task.id} disablePadding sx={{ px: 1 }}>
                     <ListItemButton
                       selected={selectedTaskId === task.id}
                       onClick={() => onTaskSelect(task.id)}
+                      sx={{
+                        borderRadius: 3,
+                        bgcolor: "background.paper",
+                        "&:hover": {
+                          bgcolor: "action.hover",
+                        },
+                        "&.Mui-selected": {
+                          bgcolor: "action.selected",
+                          "&:hover": {
+                            bgcolor: "action.selected",
+                          },
+                        },
+                      }}
                     >
                       <ListItemText
                         primary={
@@ -176,10 +202,23 @@ export const Sidebar: React.FC<SidebarProps> = ({
             {selectedTask && selectedTask.artifacts && selectedTask.artifacts.length > 0 && (
               <List subheader={<ListSubheader>Artifacts</ListSubheader>}>
                 {selectedTask.artifacts.map((artifact) => (
-                  <ListItem key={artifact.artifactId} disablePadding>
+                  <ListItem key={artifact.artifactId} disablePadding sx={{ px: 1 }}>
                     <ListItemButton
                       selected={selectedArtifactId === artifact.artifactId}
                       onClick={() => onArtifactSelect(artifact.artifactId)}
+                      sx={{
+                        borderRadius: 3,
+                        bgcolor: "background.paper",
+                        "&:hover": {
+                          bgcolor: "action.hover",
+                        },
+                        "&.Mui-selected": {
+                          bgcolor: "action.selected",
+                          "&:hover": {
+                            bgcolor: "action.selected",
+                          },
+                        },
+                      }}
                     >
                       <ListItemText
                         primary={

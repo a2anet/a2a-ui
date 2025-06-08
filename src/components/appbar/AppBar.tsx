@@ -2,7 +2,6 @@ import { Add, Chat as ChatIcon, KeyboardArrowDown, Menu as MenuIcon } from "@mui
 import {
   Box,
   Button,
-  Chip,
   Container,
   IconButton,
   Menu,
@@ -162,25 +161,53 @@ export const AppBar: React.FC<AppBarProps> = ({
           vertical: "top",
           horizontal: "left",
         }}
+        sx={{
+          "& .MuiPaper-root": {
+            borderRadius: 3,
+          },
+        }}
       >
         {agents.map((agent) => (
           <MenuItem
             key={agent.url}
             onClick={() => handleAgentSelect(agent)}
             selected={activeAgent?.url === agent.url}
-            sx={{ minWidth: 280 }}
+            sx={{
+              width: 420,
+              mx: 1,
+              borderRadius: 3,
+              bgcolor: "background.paper",
+              "&:hover": {
+                bgcolor: "action.hover",
+              },
+              "&.Mui-selected": {
+                bgcolor: "action.selected",
+                "&:hover": {
+                  bgcolor: "action.selected",
+                },
+              },
+            }}
           >
-            <Box sx={{ display: "flex", flexDirection: "column", alignItems: "flex-start" }}>
+            <Box
+              sx={{
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "flex-start",
+                width: 1,
+              }}
+            >
               <Typography variant="subtitle2">{agent.name}</Typography>
-              <Typography variant="body2" color="text.secondary" sx={{ mb: 0.5 }}>
+              <Typography
+                variant="body2"
+                color="text.secondary"
+                sx={{
+                  overflow: "hidden",
+                  textOverflow: "ellipsis",
+                  width: 1,
+                }}
+              >
                 {agent.description}
               </Typography>
-              <Box sx={{ display: "flex", gap: 0.5, flexWrap: "wrap" }}>
-                <Chip label={`v${agent.version}`} size="small" variant="outlined" />
-                {agent.provider && (
-                  <Chip label={agent.provider.organization} size="small" variant="outlined" />
-                )}
-              </Box>
             </Box>
           </MenuItem>
         ))}

@@ -1,33 +1,28 @@
-'use client';
-import { createTheme } from '@mui/material/styles';
-import { Roboto } from 'next/font/google';
+"use client";
 
-const roboto = Roboto({
-  weight: ['300', '400', '500', '700'],
-  subsets: ['latin'],
-  display: 'swap',
+import { createTheme } from "@mui/material/styles";
+import { Inter } from "next/font/google";
+
+const inter = Inter({
+  weight: ["300", "400", "500", "700"],
+  subsets: ["latin"],
+  display: "swap",
 });
 
 const theme = createTheme({
   colorSchemes: { light: true, dark: true },
   cssVariables: {
-    colorSchemeSelector: 'class',
+    colorSchemeSelector: "class",
   },
   typography: {
-    fontFamily: roboto.style.fontFamily,
+    fontFamily: inter.style.fontFamily,
   },
   components: {
-    MuiAlert: {
+    MuiButton: {
       styleOverrides: {
         root: {
-          variants: [
-            {
-              props: { severity: 'info' },
-              style: {
-                backgroundColor: '#60a5fa',
-              },
-            },
-          ],
+          textTransform: "none",
+          borderRadius: 10,
         },
       },
     },

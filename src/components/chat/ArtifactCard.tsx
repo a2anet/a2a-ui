@@ -29,6 +29,10 @@ export const ArtifactCard: React.FC<ArtifactCardProps> = ({ artifact }) => {
     <Card elevation={0} sx={{ border: "1px solid", borderColor: "divider", borderRadius: 5 }}>
       <CardContent sx={{ p: 0, "&:last-child": { pb: 0 } }}>
         <Box sx={{ px: 2, pt: 2 }}>
+          <Typography variant="body2" gutterBottom>
+            Artifact {artifact.artifactId}
+          </Typography>
+
           {artifact.name && (
             <Typography variant="h4" component="h3" gutterBottom>
               {artifact.name}
