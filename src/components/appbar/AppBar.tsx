@@ -1,4 +1,3 @@
-import { AgentCard } from "@a2a-js/sdk";
 import { Add, Chat as ChatIcon, KeyboardArrowDown, Menu as MenuIcon } from "@mui/icons-material";
 import {
   Box,
@@ -16,6 +15,7 @@ import { styled } from "@mui/material/styles";
 import React from "react";
 
 import { drawerWidth } from "@/components/sidebar/Sidebar";
+import { AgentCard } from "@/types/agent";
 
 interface StyledAppBarProps extends MuiAppBarProps {
   open?: boolean;

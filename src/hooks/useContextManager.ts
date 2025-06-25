@@ -1,5 +1,7 @@
+import React from "react";
+import { v4 as uuidv4 } from "uuid";
+
 import {
-  A2AClient,
   AgentCard,
   Message,
   MessageSendParams,
@@ -7,9 +9,7 @@ import {
   SendMessageSuccessResponse,
   Task,
   TaskState,
-} from "@a2a-js/sdk";
-import React from "react";
-import { v4 as uuidv4 } from "uuid";
+} from "@/types/agent";
 
 export interface ChatContext {
   contextId: string;
@@ -163,8 +163,6 @@ export const useContextManager = ({
     }
 
     try {
-      const client: A2AClient = new A2AClient(agent.url);
-
       const messageSendParams: MessageSendParams = {
         message: {
           contextId: contextId,
@@ -204,7 +202,24 @@ export const useContextManager = ({
         updateContext(contextId!, { pendingMessage: messageSendParams.message });
       }
 
-      const response: SendMessageResponse = await client.sendMessage(messageSendParams);
+      // Send message via our API route
+      const apiResponse: Response = await fetch("/api/send-message", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          agentUrl: agent.url,
+          messageParams: messageSendParams,
+        }),
+      });
+
+      if (!apiResponse.ok) {
+        const errorData = await apiResponse.json();
+        throw new Error(errorData.error || "Failed to send message");
+      }
+
+      const { response }: { response: SendMessageResponse } = await apiResponse.json();
 
       if ("result" in response) {
         const successResponse: SendMessageSuccessResponse = response as SendMessageSuccessResponse;

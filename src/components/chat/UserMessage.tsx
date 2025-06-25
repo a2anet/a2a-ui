@@ -1,5 +1,6 @@
-import { Message, Part, TextPart } from "@a2a-js/sdk";
 import { Box, Paper, Typography } from "@mui/material";
+
+import { Message, Part, TextPart } from "@/types/agent";
 
 interface UserMessageProps {
   message: Message;

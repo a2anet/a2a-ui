@@ -1,6 +1,5 @@
 "use client";
 
-import { Artifact, Message } from "@a2a-js/sdk";
 import { Box, Container } from "@mui/material";
 import React from "react";
 
@@ -10,6 +9,7 @@ import { ChatTextField } from "@/components/chat/ChatTextField";
 import { TaskDivider } from "@/components/chat/TaskDivider";
 import { UserMessage } from "@/components/chat/UserMessage";
 import { ChatContext } from "@/hooks/useContextManager";
+import { Artifact, Message } from "@/types/agent";
 
 interface TaskDividerItem {
   kind: "task-divider";

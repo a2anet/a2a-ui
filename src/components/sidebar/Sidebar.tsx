@@ -1,4 +1,3 @@
-import { Task, TaskState } from "@a2a-js/sdk";
 import { Chat as ChatIcon, ChevronLeft } from "@mui/icons-material";
 import {
   Box,
@@ -16,6 +15,7 @@ import { styled } from "@mui/material/styles";
 import React from "react";
 
 import { ChatContext } from "@/hooks/useContextManager";
+import { Task, TaskState } from "@/types/agent";
 
 export const drawerWidth = 280;
 

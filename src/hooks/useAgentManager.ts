@@ -1,5 +1,6 @@
-import { AgentCard } from "@a2a-js/sdk";
 import React from "react";
+
+import { AgentCard } from "@/types/agent";
 
 interface UseAgentManagerProps {
   showToast: (message: string, severity?: "error" | "warning" | "info" | "success") => void;
