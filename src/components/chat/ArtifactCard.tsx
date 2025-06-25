@@ -1,10 +1,10 @@
 "use client";
 
+import { Artifact, Part } from "@a2a-js/sdk";
 import { Box, Card, CardContent, Divider, Typography } from "@mui/material";
 import React from "react";
 
 import { TextDataPartMarkdown } from "@/components/chat/TextDataPartMarkdown";
-import { Artifact, Part } from "@/lib/a2a/types";
 
 interface ArtifactCardProps {
   artifact: Artifact;

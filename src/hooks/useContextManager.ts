@@ -1,17 +1,15 @@
-import React from "react";
-
-import { A2AClient } from "@/lib/a2a/client/client";
 import {
+  A2AClient,
   AgentCard,
   Message,
-  SendMessageRequest,
+  MessageSendParams,
   SendMessageResponse,
   SendMessageSuccessResponse,
   Task,
   TaskState,
-} from "@/lib/a2a/types";
-import { generateUUID } from "@/lib/a2a/utils";
-import { createMessageSendParamsObject } from "@/lib/utils";
+} from "@a2a-js/sdk";
+import React from "react";
+import { v4 as uuidv4 } from "uuid";
 
 export interface ChatContext {
   contextId: string;
@@ -50,13 +48,7 @@ interface UseContextManagerReturn {
 }
 
 // Terminal states that should reset tasks
-const terminalStates: TaskState[] = [
-  TaskState.Completed,
-  TaskState.Canceled,
-  TaskState.Failed,
-  TaskState.Rejected,
-  TaskState.Unknown,
-];
+const terminalStates: TaskState[] = ["completed", "canceled", "failed", "rejected", "unknown"];
 
 export const useContextManager = ({
   showToast,
@@ -145,13 +137,13 @@ export const useContextManager = ({
     if (existingTaskId && activeContext) {
       taskId = existingTaskId;
     } else {
-      taskId = generateUUID();
+      taskId = uuidv4();
       isNewTask = true;
     }
 
     // Create a temporary context if we don't have one
     if (!activeContext) {
-      contextId = generateUUID();
+      contextId = uuidv4();
       isTemporaryContext = true;
 
       const tempContext: ChatContext = {
@@ -171,8 +163,18 @@ export const useContextManager = ({
     }
 
     try {
-      const client: A2AClient = new A2AClient({ agentCard: agent });
-      const messageSendParams = createMessageSendParamsObject(messageText, taskId, contextId);
+      const client: A2AClient = new A2AClient(agent.url);
+
+      const messageSendParams: MessageSendParams = {
+        message: {
+          contextId: contextId,
+          kind: "message",
+          messageId: uuidv4(),
+          parts: [{ kind: "text", text: messageText }],
+          role: "user",
+          taskId: taskId,
+        },
+      };
 
       // Create a temporary task if this is a new task
       if (isNewTask) {
@@ -180,7 +182,7 @@ export const useContextManager = ({
           id: taskId,
           contextId: contextId!,
           status: {
-            state: TaskState.Submitted,
+            state: "submitted",
             timestamp: new Date().toISOString(),
           },
           history: [messageSendParams.message],
@@ -202,13 +204,7 @@ export const useContextManager = ({
         updateContext(contextId!, { pendingMessage: messageSendParams.message });
       }
 
-      const request: SendMessageRequest = {
-        jsonrpc: "2.0",
-        method: "message/send",
-        params: messageSendParams,
-      };
-
-      const response: SendMessageResponse = await client.sendMessage(request);
+      const response: SendMessageResponse = await client.sendMessage(messageSendParams);
 
       if ("result" in response) {
         const successResponse: SendMessageSuccessResponse = response as SendMessageSuccessResponse;

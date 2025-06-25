@@ -1,3 +1,4 @@
+import { Task, TaskState } from "@a2a-js/sdk";
 import { Chat as ChatIcon, ChevronLeft } from "@mui/icons-material";
 import {
   Box,
@@ -15,7 +16,6 @@ import { styled } from "@mui/material/styles";
 import React from "react";
 
 import { ChatContext } from "@/hooks/useContextManager";
-import { Task, TaskState } from "@/lib/a2a/types";
 
 export const drawerWidth = 280;
 
@@ -53,24 +53,25 @@ export const Sidebar: React.FC<SidebarProps> = ({
   onClose,
 }) => {
   const getTaskStateText = (state: TaskState): string => {
+    // export type TaskState = "submitted" | "working" | "input-required" | "completed" | "canceled" | "failed" | "rejected" | "auth-required" | "unknown";
     switch (state) {
-      case TaskState.Submitted:
+      case "submitted":
         return "Submitted";
-      case TaskState.Working:
+      case "working":
         return "Working";
-      case TaskState.InputRequired:
+      case "input-required":
         return "Input Required";
-      case TaskState.Completed:
+      case "completed":
         return "Completed";
-      case TaskState.Canceled:
+      case "canceled":
         return "Canceled";
-      case TaskState.Failed:
+      case "failed":
         return "Failed";
-      case TaskState.Rejected:
+      case "rejected":
         return "Rejected";
-      case TaskState.AuthRequired:
+      case "auth-required":
         return "Auth Required";
-      case TaskState.Unknown:
+      case "unknown":
         return "Unknown";
       default:
         return "Unknown";

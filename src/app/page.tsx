@@ -1,5 +1,6 @@
 "use client";
 
+import { AgentCard } from "@a2a-js/sdk";
 import { Box, Toolbar } from "@mui/material";
 import { styled } from "@mui/material/styles";
 import React from "react";
@@ -11,7 +12,6 @@ import { Sidebar, drawerWidth } from "@/components/sidebar/Sidebar";
 import { useToastContext } from "@/contexts/ToastContext";
 import { useAgentManager } from "@/hooks/useAgentManager";
 import { useContextManager } from "@/hooks/useContextManager";
-import { AgentCard } from "@/lib/a2a/types";
 
 const Main = styled("main", { shouldForwardProp: (prop) => prop !== "open" })<{
   open?: boolean;

@@ -1,3 +1,4 @@
+import { A2AClient, AgentCard } from "@a2a-js/sdk";
 import {
   Box,
   Button,
@@ -9,9 +10,6 @@ import {
   Typography,
 } from "@mui/material";
 import React from "react";
-
-import { A2ACardResolver } from "@/lib/a2a/client/client";
-import { AgentCard } from "@/lib/a2a/types";
 
 interface AddAgentModalProps {
   open: boolean;
@@ -43,16 +41,9 @@ export const AddAgentModal: React.FC<AddAgentModalProps> = ({
     setLoading(true);
 
     try {
-      // Extract base URL and agent card path from the full URL
-      const urlObj: URL = new URL(url.trim());
-      const baseUrl: string = `${urlObj.protocol}//${urlObj.host}`;
-      const agentCardPath: string =
-        urlObj.pathname !== "/" ? urlObj.pathname : "/.well-known/agent.json";
-
       // Fetch the agent card
-      const resolver = new A2ACardResolver(baseUrl, agentCardPath);
-      const agentCard = await resolver.getAgentCard();
-
+      const client: A2AClient = new A2AClient(url);
+      const agentCard: AgentCard = await client.getAgentCard();
       onAgentAdded(agentCard);
       handleClose();
     } catch (error) {
