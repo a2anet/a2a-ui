@@ -6,6 +6,7 @@ import React from "react";
 import { AIMessage } from "@/components/chat/AIMessage";
 import { ArtifactAccordion } from "@/components/chat/ArtifactAccordion";
 import { ChatTextField } from "@/components/chat/ChatTextField";
+import { Loading } from "@/components/chat/Loading";
 import { TaskDivider } from "@/components/chat/TaskDivider";
 import { ToolCallAccordion } from "@/components/chat/ToolCallAccordion";
 import { UserMessage } from "@/components/chat/UserMessage";
@@ -235,6 +236,13 @@ export const Chat: React.FC<ChatProps> = ({
             );
           }
         })}
+
+        {context?.loading && (
+          <Box sx={{ mb: 4 }}>
+            <Loading />
+          </Box>
+        )}
+
         <div ref={messagesEndRef} />
       </Container>
 
