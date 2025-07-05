@@ -14,6 +14,11 @@ const theme = createTheme({
   cssVariables: {
     colorSchemeSelector: "class",
   },
+  palette: {
+    primary: {
+      main: "#222",
+    },
+  },
   typography: {
     fontFamily: inter.style.fontFamily,
   },
