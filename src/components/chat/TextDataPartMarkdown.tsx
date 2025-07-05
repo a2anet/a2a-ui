@@ -81,7 +81,7 @@ export const TextDataPartMarkdown: React.FC<TextDataPartMarkdownProps> = ({ part
         part.data,
         null,
         4
-      )}\n\`\`\``}</MuiMarkdown>
+      )}\`\`\``}</MuiMarkdown>
     );
   }
 };

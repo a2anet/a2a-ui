@@ -46,11 +46,13 @@ For an example, see [Tavily Agent](https://github.com/A2ANet/TavilyAgent).
 
 ## Roadmap
 
-- Add CI/CD
-- Add tests
-- Add "Contributing" section
-- Refactor `useAgentManager` and `useContextManager`
-- Add message streaming
-- Migrate A2A SDK to server-side APIs
-- Enable multi-agent conversations
-- Add push notifications
+- [x] Migrate A2A SDK to server-side APIs
+- [x] Add tool calls
+- [ ] Refactor `useAgentManager` and `useContextManager`
+- [ ] Create component library
+- [ ] Add CI/CD
+- [ ] Add tests
+- [ ] Add "Contributing" section
+- [ ] Add message streaming
+- [ ] Enable multi-agent conversations
+- [ ] Add push notifications

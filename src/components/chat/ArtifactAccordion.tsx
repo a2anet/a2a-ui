@@ -1,12 +1,13 @@
 "use client";
 
-import { Box, Card, CardContent, Divider, Typography } from "@mui/material";
+import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
+import { Accordion, AccordionDetails, AccordionSummary, Box, Typography } from "@mui/material";
 import React from "react";
 
 import { TextDataPartMarkdown } from "@/components/chat/TextDataPartMarkdown";
 import { Artifact, Part } from "@/types/agent";
 
-interface ArtifactCardProps {
+interface ArtifactAccordionProps {
   artifact: Artifact;
 }
 
@@ -24,11 +25,14 @@ const renderPart = (part: Part, index: number): React.ReactNode => {
   }
 };
 
-export const ArtifactCard: React.FC<ArtifactCardProps> = ({ artifact }) => {
+export const ArtifactAccordion: React.FC<ArtifactAccordionProps> = ({ artifact }) => {
   return (
-    <Card elevation={0} sx={{ border: "1px solid", borderColor: "divider", borderRadius: 5 }}>
-      <CardContent sx={{ p: 0, "&:last-child": { pb: 0 } }}>
-        <Box sx={{ px: 2, pt: 2 }}>
+    <Accordion
+      square={true}
+      sx={{ border: "1px solid", borderColor: "divider", borderRadius: 5, boxShadow: "none" }}
+    >
+      <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+        <Box>
           <Typography variant="body2" gutterBottom>
             Artifact {artifact.artifactId}
           </Typography>
@@ -45,11 +49,11 @@ export const ArtifactCard: React.FC<ArtifactCardProps> = ({ artifact }) => {
             </Typography>
           )}
         </Box>
+      </AccordionSummary>
 
-        {(artifact.name || artifact.description) && <Divider sx={{ my: 2 }} />}
-
-        <Box sx={{ px: 2 }}>{artifact.parts.map((part, index) => renderPart(part, index))}</Box>
-      </CardContent>
-    </Card>
+      <AccordionDetails>
+        {artifact.parts.map((part, index) => renderPart(part, index))}
+      </AccordionDetails>
+    </Accordion>
   );
 };

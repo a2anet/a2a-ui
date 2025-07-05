@@ -4,9 +4,10 @@ import { Box, Container } from "@mui/material";
 import React from "react";
 
 import { AIMessage } from "@/components/chat/AIMessage";
-import { ArtifactCard } from "@/components/chat/ArtifactCard";
+import { ArtifactAccordion } from "@/components/chat/ArtifactAccordion";
 import { ChatTextField } from "@/components/chat/ChatTextField";
 import { TaskDivider } from "@/components/chat/TaskDivider";
+import { ToolCallAccordion } from "@/components/chat/ToolCallAccordion";
 import { UserMessage } from "@/components/chat/UserMessage";
 import { ChatContext } from "@/hooks/useContextManager";
 import { Artifact, Message } from "@/types/agent";
@@ -16,7 +17,13 @@ interface TaskDividerItem {
   taskId: string;
 }
 
-type ChatItem = Message | Artifact | TaskDividerItem;
+interface ToolCallItem {
+  kind: "tool-call";
+  toolCallMessage: Message;
+  toolCallResultMessage: Message | undefined;
+}
+
+type ChatItem = Message | Artifact | TaskDividerItem | ToolCallItem;
 
 interface ChatProps {
   context?: ChatContext;
@@ -55,14 +62,36 @@ export const Chat: React.FC<ChatProps> = ({
           taskId: task.id,
         });
 
-        // Add messages from task history
+        // Combine history with status message
+        let messages: Message[] = [];
+
         if (task.history) {
-          chatItems2.push(...task.history);
+          messages = [...task.history];
         }
 
-        // Add the latest status message if it exists
         if (task.status.message) {
-          chatItems2.push(task.status.message);
+          messages.push(task.status.message);
+        }
+
+        // Add messages to chat items
+        for (const message of messages) {
+          if (!message.metadata?.type) {
+            chatItems2.push(message);
+          } else if (message.metadata?.type === "tool-call") {
+            const toolCallId: string = message.metadata.toolCallId as string;
+
+            const toolCallResultMessage: Message | undefined = messages.find(
+              (message) =>
+                message.metadata?.type === "tool-call-result" &&
+                message.metadata?.toolCallId === toolCallId
+            );
+
+            chatItems2.push({
+              kind: "tool-call",
+              toolCallMessage: message,
+              toolCallResultMessage: toolCallResultMessage,
+            });
+          }
         }
 
         // Add artifacts if they exist
@@ -155,10 +184,37 @@ export const Chat: React.FC<ChatProps> = ({
             return (
               <Box key={message.messageId} sx={{ mb: 4 }}>
                 {message.role === "user" ? (
-                  <UserMessage message={message} />
+                  <Box
+                    sx={{
+                      display: "flex",
+                      justifyContent: "flex-end",
+                    }}
+                  >
+                    <Box sx={{ maxWidth: "70%" }}>
+                      <UserMessage message={message} />
+                    </Box>
+                  </Box>
                 ) : (
-                  <AIMessage message={message} />
+                  <Box
+                    sx={{
+                      display: "flex",
+                      justifyContent: "flex-start",
+                    }}
+                  >
+                    <AIMessage message={message} />
+                  </Box>
                 )}
+              </Box>
+            );
+          } else if ("kind" in item && item.kind === "tool-call") {
+            const toolCallItem: ToolCallItem = item as ToolCallItem;
+
+            return (
+              <Box key={toolCallItem.toolCallMessage.messageId} sx={{ mb: 4 }}>
+                <ToolCallAccordion
+                  toolCallMessage={toolCallItem.toolCallMessage}
+                  toolCallResultMessage={toolCallItem.toolCallResultMessage}
+                />
               </Box>
             );
           } else {
@@ -174,7 +230,7 @@ export const Chat: React.FC<ChatProps> = ({
                   }
                 }}
               >
-                <ArtifactCard artifact={artifact} />
+                <ArtifactAccordion artifact={artifact} />
               </Box>
             );
           }

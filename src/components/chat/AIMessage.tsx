@@ -1,5 +1,3 @@
-import { Box } from "@mui/material";
-
 import { TextDataPartMarkdown } from "@/components/chat/TextDataPartMarkdown";
 import { DataPart, Message, TextPart } from "@/types/agent";
 
@@ -12,16 +10,5 @@ export const AIMessage: React.FC<AIMessageProps> = ({ message }) => {
     (part) => part.kind === "text" || part.kind === "data"
   );
 
-  return (
-    <Box
-      sx={{
-        display: "flex",
-        justifyContent: "flex-start",
-      }}
-    >
-      {textDataParts.map((part, index) => (
-        <TextDataPartMarkdown key={index} part={part} />
-      ))}
-    </Box>
-  );
+  return textDataParts.map((part, index) => <TextDataPartMarkdown key={index} part={part} />);
 };

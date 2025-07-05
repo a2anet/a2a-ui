@@ -1,41 +1,29 @@
-import { Box, Paper, Typography } from "@mui/material";
+import { Paper } from "@mui/material";
 
-import { Message, Part, TextPart } from "@/types/agent";
+import { TextDataPartMarkdown } from "@/components/chat/TextDataPartMarkdown";
+import { DataPart, Message, TextPart } from "@/types/agent";
 
 interface UserMessageProps {
   message: Message;
 }
 
 export const UserMessage: React.FC<UserMessageProps> = ({ message }) => {
-  const textParts: string = message.parts
-    .filter((part: Part) => part.kind === "text")
-    .map((part: TextPart) => part.text)
-    .join(" ");
+  const textDataParts: (TextPart | DataPart)[] = message.parts.filter(
+    (part) => part.kind === "text" || part.kind === "data"
+  );
 
   return (
-    <Box
+    <Paper
+      elevation={0}
       sx={{
-        display: "flex",
-        justifyContent: "flex-end",
+        bgcolor: "grey.100",
+        p: 2,
+        borderRadius: 5,
       }}
     >
-      <Paper
-        elevation={0}
-        sx={{
-          bgcolor: "grey.100",
-          p: 2,
-          maxWidth: "70%",
-          borderRadius: 5,
-        }}
-      >
-        <Typography
-          sx={{
-            whiteSpace: "pre-wrap",
-          }}
-        >
-          {textParts}
-        </Typography>
-      </Paper>
-    </Box>
+      {textDataParts.map((part, index) => (
+        <TextDataPartMarkdown key={index} part={part} />
+      ))}
+    </Paper>
   );
 };
