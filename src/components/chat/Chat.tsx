@@ -10,8 +10,8 @@ import { Loading } from "@/components/chat/Loading";
 import { TaskDivider } from "@/components/chat/TaskDivider";
 import { ToolCallAccordion } from "@/components/chat/ToolCallAccordion";
 import { UserMessage } from "@/components/chat/UserMessage";
-import { ChatContext } from "@/hooks/useContextManager";
 import { Artifact, Message } from "@/types/agent";
+import { ChatContext } from "@/types/chat";
 
 interface TaskDividerItem {
   kind: "task-divider";
@@ -30,22 +30,20 @@ interface ChatProps {
   context?: ChatContext;
   scrollToTaskId?: string;
   scrollToArtifactId?: string;
-  onScrollComplete: () => void;
+  currentMessageText: string;
+  autoFocusChatTextField?: boolean;
   onSendMessage: (message: string) => void;
-  onTextFieldChange: (value: string) => void;
-  currentMessageText?: string;
-  autoFocus?: boolean;
+  onChatTextFieldChange: (value: string) => void;
 }
 
 export const Chat: React.FC<ChatProps> = ({
   context,
   scrollToTaskId,
   scrollToArtifactId,
-  onScrollComplete,
-  onSendMessage,
-  onTextFieldChange,
   currentMessageText,
-  autoFocus = false,
+  autoFocusChatTextField = false,
+  onSendMessage,
+  onChatTextFieldChange,
 }) => {
   const messagesEndRef = React.useRef<HTMLDivElement>(null);
   const taskRefs = React.useRef<Map<string, HTMLDivElement>>(new Map());
@@ -114,41 +112,27 @@ export const Chat: React.FC<ChatProps> = ({
     onSendMessage(message);
   };
 
-  const scrollToBottom = (): void => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  };
-
-  const scrollToTask = (taskId: string): void => {
-    const element = taskRefs.current.get(taskId);
-
-    if (element) {
-      element.scrollIntoView({ behavior: "smooth", block: "start" });
-      setTimeout(() => onScrollComplete(), 500);
-    }
-  };
-
-  const scrollToArtifact = (artifactId: string): void => {
-    const element = artifactRefs.current.get(artifactId);
-
-    if (element) {
-      element.scrollIntoView({ behavior: "smooth", block: "start" });
-      setTimeout(() => onScrollComplete(), 500);
-    }
-  };
-
   React.useEffect(() => {
-    scrollToBottom();
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [chatItems]);
 
   React.useEffect(() => {
     if (scrollToTaskId) {
-      scrollToTask(scrollToTaskId);
+      const element = taskRefs.current.get(scrollToTaskId);
+
+      if (element) {
+        element.scrollIntoView({ behavior: "smooth", block: "start" });
+      }
     }
   }, [scrollToTaskId]);
 
   React.useEffect(() => {
     if (scrollToArtifactId) {
-      scrollToArtifact(scrollToArtifactId);
+      const element = artifactRefs.current.get(scrollToArtifactId);
+
+      if (element) {
+        element.scrollIntoView({ behavior: "smooth", block: "start" });
+      }
     }
   }, [scrollToArtifactId]);
 
@@ -259,11 +243,11 @@ export const Chat: React.FC<ChatProps> = ({
       >
         <Container maxWidth="md">
           <ChatTextField
-            onSendMessage={handleSendMessage}
+            value={currentMessageText}
             loading={context?.loading}
-            value={currentMessageText || ""}
-            onChange={onTextFieldChange}
-            autoFocus={autoFocus}
+            autoFocus={autoFocusChatTextField}
+            onChange={onChatTextFieldChange}
+            onSendMessage={handleSendMessage}
           />
         </Container>
       </Box>

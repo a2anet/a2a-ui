@@ -3,7 +3,7 @@
 import { Alert, Snackbar } from "@mui/material";
 import React from "react";
 
-import { useToast, type ToastSeverity } from "@/hooks/useToast";
+export type ToastSeverity = "error" | "warning" | "info" | "success";
 
 interface ToastContextValue {
   showToast: (message: string, severity?: ToastSeverity) => void;
@@ -16,28 +16,44 @@ interface ToastProviderProps {
 }
 
 export const ToastProvider: React.FC<ToastProviderProps> = ({ children }) => {
-  const toast = useToast();
+  const [toastOpen, setToastOpen] = React.useState<boolean>(false);
+  const [toastMessage, setToastMessage] = React.useState<string>("");
+  const [toastSeverity, setToastSeverity] = React.useState<ToastSeverity>("error");
+
+  const showToast = (message: string, severity: ToastSeverity = "error"): void => {
+    setToastMessage(message);
+    setToastSeverity(severity);
+    setToastOpen(true);
+  };
+
+  const handleToastClose = (event?: React.SyntheticEvent | Event, reason?: string): void => {
+    if (reason === "clickaway") {
+      return;
+    }
+
+    setToastOpen(false);
+  };
 
   const contextValue: ToastContextValue = {
-    showToast: toast.showToast,
+    showToast,
   };
 
   return (
     <ToastContext.Provider value={contextValue}>
       {children}
       <Snackbar
-        open={toast.toastOpen}
-        onClose={toast.handleToastClose}
+        open={toastOpen}
+        onClose={handleToastClose}
         autoHideDuration={5000}
         anchorOrigin={{ vertical: "top", horizontal: "center" }}
       >
         <Alert
-          onClose={toast.handleToastClose}
-          severity={toast.toastSeverity}
+          onClose={handleToastClose}
+          severity={toastSeverity}
           variant="filled"
           sx={{ width: "100%" }}
         >
-          {toast.toastMessage}
+          {toastMessage}
         </Alert>
       </Snackbar>
     </ToastContext.Provider>

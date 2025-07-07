@@ -14,8 +14,8 @@ import {
 import { styled } from "@mui/material/styles";
 import React from "react";
 
-import { ChatContext } from "@/hooks/useContextManager";
 import { Task, TaskState } from "@/types/agent";
+import { ChatContext } from "@/types/chat";
 
 export const drawerWidth = 280;
 
@@ -81,6 +81,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
   const selectedContext: ChatContext | undefined = contexts.find(
     (context) => context.contextId === selectedContextId
   );
+
   const selectedTask: Task | undefined =
     selectedContext && selectedTaskId
       ? selectedContext.tasks.find((task) => task.id === selectedTaskId)

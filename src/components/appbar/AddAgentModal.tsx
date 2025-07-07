@@ -10,21 +10,13 @@ import {
 } from "@mui/material";
 import React from "react";
 
-import { AgentCard } from "@/types/agent";
-
 interface AddAgentModalProps {
   open: boolean;
-  onAgentAdded: (agent: AgentCard) => void;
   onClose: () => void;
-  onError: (message: string) => void;
+  addAgentByUrl: (url: string) => Promise<void>;
 }
 
-export const AddAgentModal: React.FC<AddAgentModalProps> = ({
-  open,
-  onAgentAdded,
-  onClose,
-  onError,
-}) => {
+export const AddAgentModal: React.FC<AddAgentModalProps> = ({ open, onClose, addAgentByUrl }) => {
   const [url, setUrl] = React.useState<string>("");
   const [loading, setLoading] = React.useState<boolean>(false);
 
@@ -42,28 +34,10 @@ export const AddAgentModal: React.FC<AddAgentModalProps> = ({
     setLoading(true);
 
     try {
-      // Fetch the agent card using our API route
-      const response: Response = await fetch("/api/get-agent-card", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ url: url.trim() }),
-      });
-
-      if (!response.ok) {
-        const errorData: { error: string } = await response.json();
-
-        throw new Error(errorData.error || "Failed to fetch agent card");
-      }
-
-      const { agentCard }: { agentCard: AgentCard } = await response.json();
-      onAgentAdded(agentCard);
+      await addAgentByUrl(url.trim());
       handleClose();
     } catch (error) {
       console.error("Error adding agent:", error);
-      const errorMessage = error instanceof Error ? error.message : "Unknown error occurred";
-      onError(`Failed to fetch agent card: ${errorMessage}`);
     } finally {
       setLoading(false);
     }

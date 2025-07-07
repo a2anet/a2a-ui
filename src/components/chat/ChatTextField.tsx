@@ -3,19 +3,19 @@ import { IconButton, InputAdornment, TextField } from "@mui/material";
 import React from "react";
 
 interface ChatTextFieldProps {
-  onSendMessage: (message: string) => void;
-  loading?: boolean;
   value: string;
-  onChange: (value: string) => void;
+  loading?: boolean;
   autoFocus?: boolean;
+  onChange: (value: string) => void;
+  onSendMessage: (message: string) => void;
 }
 
 export const ChatTextField: React.FC<ChatTextFieldProps> = ({
-  onSendMessage,
-  loading = false,
   value,
-  onChange,
+  loading = false,
   autoFocus = false,
+  onChange,
+  onSendMessage,
 }) => {
   const inputRef = React.useRef<HTMLInputElement>(null);
 
