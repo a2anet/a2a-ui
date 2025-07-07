@@ -21,7 +21,7 @@ export const drawerWidth = 280;
 
 interface SidebarProps {
   open: boolean;
-  contexts: ChatContext[];
+  chatContexts: { [contextId: string]: ChatContext };
   selectedContextId: string | undefined;
   selectedTaskId: string | undefined;
   selectedArtifactId: string | undefined;
@@ -42,7 +42,7 @@ const DrawerHeader = styled("div")(({ theme }) => ({
 
 export const Sidebar: React.FC<SidebarProps> = ({
   open,
-  contexts,
+  chatContexts,
   selectedContextId,
   selectedTaskId,
   selectedArtifactId,
@@ -78,9 +78,9 @@ export const Sidebar: React.FC<SidebarProps> = ({
     }
   };
 
-  const selectedContext: ChatContext | undefined = contexts.find(
-    (context) => context.contextId === selectedContextId
-  );
+  const selectedContext: ChatContext | undefined = selectedContextId
+    ? chatContexts[selectedContextId]
+    : undefined;
 
   const selectedTask: Task | undefined =
     selectedContext && selectedTaskId
@@ -131,39 +131,41 @@ export const Sidebar: React.FC<SidebarProps> = ({
       </Box>
 
       <Box sx={{ flex: 1, overflow: "auto" }}>
-        {contexts && contexts.length > 0 && (
+        {chatContexts && Object.keys(chatContexts).length > 0 && (
           <>
             <List subheader={<ListSubheader>Contexts</ListSubheader>}>
-              {contexts.toReversed().map((context) => (
-                <ListItem key={context.contextId} disablePadding sx={{ px: 1 }}>
-                  <ListItemButton
-                    selected={selectedContextId === context.contextId}
-                    onClick={() => onContextSelect(context.contextId)}
-                    sx={{
-                      borderRadius: 3,
-                      bgcolor: "background.paper",
-                      "&:hover": {
-                        bgcolor: "action.hover",
-                      },
-                      "&.Mui-selected": {
-                        bgcolor: "action.selected",
+              {Object.values(chatContexts)
+                .toReversed()
+                .map((context) => (
+                  <ListItem key={context.contextId} disablePadding sx={{ px: 1 }}>
+                    <ListItemButton
+                      selected={selectedContextId === context.contextId}
+                      onClick={() => onContextSelect(context.contextId)}
+                      sx={{
+                        borderRadius: 3,
+                        bgcolor: "background.paper",
                         "&:hover": {
-                          bgcolor: "action.selected",
+                          bgcolor: "action.hover",
                         },
-                      },
-                    }}
-                  >
-                    <ListItemText
-                      primary={
-                        <Typography variant="body2" noWrap>
-                          {context.contextId}
-                        </Typography>
-                      }
-                      secondary={context.agent.name}
-                    />
-                  </ListItemButton>
-                </ListItem>
-              ))}
+                        "&.Mui-selected": {
+                          bgcolor: "action.selected",
+                          "&:hover": {
+                            bgcolor: "action.selected",
+                          },
+                        },
+                      }}
+                    >
+                      <ListItemText
+                        primary={
+                          <Typography variant="body2" noWrap>
+                            {context.contextId}
+                          </Typography>
+                        }
+                        secondary={context.agent.name}
+                      />
+                    </ListItemButton>
+                  </ListItem>
+                ))}
             </List>
 
             {selectedContext && selectedContext.tasks && selectedContext.tasks.length > 0 && (

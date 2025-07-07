@@ -11,9 +11,16 @@ export const Loading: React.FC<LoadingProps> = ({ text = "Loading" }) => {
   React.useEffect(() => {
     const interval = setInterval(() => {
       setLoadingDots((prev) => {
-        if (prev === ".") return "..";
-        if (prev === "..") return "...";
-        return ".";
+        switch (prev) {
+          case "":
+            return ".";
+          case ".":
+            return "..";
+          case "..":
+            return "...";
+          default:
+            return "";
+        }
       });
     }, 500);
 

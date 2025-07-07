@@ -51,7 +51,7 @@ export const ChatPage: React.FC = () => {
 
       <Sidebar
         open={sidebarOpen}
-        contexts={Object.values(chat.chatContexts.contexts)}
+        chatContexts={chat.chatContexts.chatContexts}
         selectedContextId={chat.selected.selectedContextId}
         selectedTaskId={chat.selected.selectedTaskId}
         selectedArtifactId={chat.selected.selectedArtifactId}
@@ -75,7 +75,7 @@ export const ChatPage: React.FC = () => {
           }}
         >
           <Chat
-            context={chat.activeContext}
+            activeChatContext={chat.activeChatContext}
             scrollToTaskId={chat.scrolling.scrollToTaskId}
             scrollToArtifactId={chat.scrolling.scrollToArtifactId}
             currentMessageText={chat.currentMessageText}

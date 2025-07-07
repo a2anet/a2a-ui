@@ -27,7 +27,7 @@ interface ToolCallItem {
 type ChatItem = Message | Artifact | TaskDividerItem | ToolCallItem;
 
 interface ChatProps {
-  context?: ChatContext;
+  activeChatContext?: ChatContext;
   scrollToTaskId?: string;
   scrollToArtifactId?: string;
   currentMessageText: string;
@@ -37,7 +37,7 @@ interface ChatProps {
 }
 
 export const Chat: React.FC<ChatProps> = ({
-  context,
+  activeChatContext,
   scrollToTaskId,
   scrollToArtifactId,
   currentMessageText,
@@ -53,8 +53,8 @@ export const Chat: React.FC<ChatProps> = ({
   const chatItems: ChatItem[] = React.useMemo(() => {
     const chatItems2: ChatItem[] = [];
 
-    if (context) {
-      for (const task of context.tasks) {
+    if (activeChatContext) {
+      for (const task of activeChatContext.tasks) {
         // Add task divider at the start of each task
         chatItems2.push({
           kind: "task-divider",
@@ -100,13 +100,13 @@ export const Chat: React.FC<ChatProps> = ({
       }
 
       // Add pending message for immediate display
-      if (context.pendingMessage) {
-        chatItems2.push(context.pendingMessage);
+      if (activeChatContext.pendingMessage) {
+        chatItems2.push(activeChatContext.pendingMessage);
       }
     }
 
     return chatItems2;
-  }, [context]);
+  }, [activeChatContext]);
 
   const handleSendMessage = (message: string): void => {
     onSendMessage(message);
@@ -221,7 +221,7 @@ export const Chat: React.FC<ChatProps> = ({
           }
         })}
 
-        {context?.loading && (
+        {activeChatContext?.loading && (
           <Box sx={{ mb: 4 }}>
             <Loading />
           </Box>
@@ -244,7 +244,7 @@ export const Chat: React.FC<ChatProps> = ({
         <Container maxWidth="md">
           <ChatTextField
             value={currentMessageText}
-            loading={context?.loading}
+            loading={activeChatContext?.loading}
             autoFocus={autoFocusChatTextField}
             onChange={onChatTextFieldChange}
             onSendMessage={handleSendMessage}

@@ -1,13 +1,6 @@
 import { v4 as uuidv4 } from "uuid";
 
-import {
-  AgentCard,
-  Message,
-  MessageSendParams,
-  SendMessageResponse,
-  Task,
-  TaskState,
-} from "@/types/agent";
+import { AgentCard, MessageSendParams, SendMessageResponse, Task, TaskState } from "@/types/agent";
 import { ChatContext } from "@/types/chat";
 
 // Terminal states that should reset tasks
@@ -59,7 +52,7 @@ export const createMessageSendParams = (
   },
 });
 
-export const createTempContext = (contextId: string, agent: AgentCard): ChatContext => ({
+export const createTempChatContext = (contextId: string, agent: AgentCard): ChatContext => ({
   contextId,
   agent,
   tasks: [],
@@ -68,14 +61,14 @@ export const createTempContext = (contextId: string, agent: AgentCard): ChatCont
   loading: true,
 });
 
-export const createTempTask = (taskId: string, contextId: string, message: Message): Task => ({
+export const createTempTask = (taskId: string, contextId: string): Task => ({
   id: taskId,
   contextId,
   status: {
     state: "submitted",
     timestamp: new Date().toISOString(),
   },
-  history: [message],
+  history: [],
   artifacts: [],
   metadata: {},
   kind: "task",
