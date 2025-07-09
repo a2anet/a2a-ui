@@ -84,3 +84,11 @@ For an example, see [Tavily Agent's `agent_executor.py`](https://github.com/A2AN
 - [ ] Add message streaming
 - [ ] Enable multi-agent conversations
 - [ ] Add push notifications
+
+## Join the A2A Net Community
+
+A2A Net is a site to find and share AI agents and open-source community. Join to share your A2A agents, ask questions, stay up-to-date with the latest A2A news, be the first to hear about open-source releases, tutorials, and more!
+
+- 🌍 Site: https://a2anet.com/
+- 👽 Reddit: https://www.reddit.com/r/A2ANet/
+- 💬 Discord: https://discord.gg/BwKQDwTS
