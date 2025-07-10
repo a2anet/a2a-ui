@@ -11,6 +11,10 @@ This repository aims to be like one of the first web browsers that allowed peopl
 
 ![A2A UI Screenshot](/images/A2A%20UI%20Screenshot.jpeg)
 
+## Demo
+
+Watch [Agent2Agent (A2A) UI Demo - A UI for every agent framework](https://www.youtube.com/watch?v=A4objPue-XM) on YouTube.
+
 ## Features
 
 This repository demonstrates how the A2A protocol has standardised communication between people and agents:
@@ -76,12 +80,12 @@ For an example, see [Tavily Agent's `agent_executor.py`](https://github.com/A2AN
 
 - [x] Migrate A2A SDK to server-side APIs
 - [x] Add tool calls
-- [ ] Refactor `useAgentManager` and `useContextManager`
-- [ ] Create component library
 - [ ] Add CI/CD
 - [ ] Add tests
 - [ ] Add "Contributing" section
 - [ ] Add message streaming
+- [ ] Add support for files
+- [ ] Create component library
 - [ ] Enable multi-agent conversations
 - [ ] Add push notifications
 
@@ -90,5 +94,4 @@ For an example, see [Tavily Agent's `agent_executor.py`](https://github.com/A2AN
 A2A Net is a site to find and share AI agents and open-source community. Join to share your A2A agents, ask questions, stay up-to-date with the latest A2A news, be the first to hear about open-source releases, tutorials, and more!
 
 - 🌍 Site: https://a2anet.com/
-- 👽 Reddit: https://www.reddit.com/r/A2ANet/
-- 💬 Discord: https://discord.gg/BwKQDwTS
+- 🤖 Discord: https://discord.gg/674NGXpAjU
