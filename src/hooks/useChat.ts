@@ -9,7 +9,6 @@ import { useSelected, UseSelectedReturn } from "@/hooks/useSelected";
 import {
   createMessageSendParams,
   createTempChatContext,
-  createTempTask,
   sendMessageToAgent,
   terminalStates,
 } from "@/lib/chat";
@@ -151,11 +150,9 @@ export const useChat = (): UseChatReturn => {
       return;
     }
 
-    // Setup context and task
+    // Setup context
     const contextId: string = activeChatContext?.contextId || uuidv4();
     const isNewContext: boolean = !activeChatContext?.contextId;
-    const taskId: string = activeTask?.id || uuidv4();
-    const isNewTask: boolean = !activeTask?.id;
 
     if (isNewContext) {
       const tempContext: ChatContext = createTempChatContext(contextId, agents.activeAgent);
@@ -163,14 +160,8 @@ export const useChat = (): UseChatReturn => {
       selected.setSelectedContextId(contextId);
     }
 
-    if (isNewTask) {
-      const tempTask: Task = createTempTask(taskId, contextId);
-      chatContexts.addTaskToContext(contextId, tempTask);
-      selected.setSelectedTaskId(taskId);
-    }
-
     try {
-      const messageSendParams = createMessageSendParams(messageText, contextId, taskId);
+      const messageSendParams = createMessageSendParams(messageText, contextId, activeTask?.id);
 
       // Set loading, message text, and pending message
       chatContexts.setChatContextLoading(contextId, true);
@@ -190,6 +181,7 @@ export const useChat = (): UseChatReturn => {
       if ("result" in response) {
         const task = response.result as Task;
         chatContexts.updateTaskInContext(contextId, task);
+        selected.setSelectedTaskId(task.id);
         chatContexts.setChatContextPendingMessage(contextId, null);
         chatContexts.setChatContextLoading(contextId, false);
       } else {

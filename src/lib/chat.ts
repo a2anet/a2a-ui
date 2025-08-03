@@ -1,6 +1,6 @@
 import { v4 as uuidv4 } from "uuid";
 
-import { AgentCard, MessageSendParams, SendMessageResponse, Task, TaskState } from "@/types/agent";
+import { AgentCard, MessageSendParams, SendMessageResponse, TaskState } from "@/types/agent";
 import { ChatContext } from "@/types/chat";
 
 // Terminal states that should reset tasks
@@ -40,7 +40,7 @@ export const sendMessageToAgent = async (
 export const createMessageSendParams = (
   messageText: string,
   contextId: string,
-  taskId: string
+  taskId?: string
 ): MessageSendParams => ({
   message: {
     contextId,
@@ -48,7 +48,7 @@ export const createMessageSendParams = (
     messageId: uuidv4(),
     parts: [{ kind: "text", text: messageText }],
     role: "user",
-    taskId,
+    ...(taskId && { taskId }),
   },
 });
 
@@ -59,17 +59,4 @@ export const createTempChatContext = (contextId: string, agent: AgentCard): Chat
   pendingMessage: null,
   messageText: "",
   loading: true,
-});
-
-export const createTempTask = (taskId: string, contextId: string): Task => ({
-  id: taskId,
-  contextId,
-  status: {
-    state: "submitted",
-    timestamp: new Date().toISOString(),
-  },
-  history: [],
-  artifacts: [],
-  metadata: {},
-  kind: "task",
 });
