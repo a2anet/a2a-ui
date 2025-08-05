@@ -78,16 +78,16 @@ export const ChatTextField: React.FC<ChatTextFieldProps> = ({
                 onClick={handleSend}
                 disabled={!value.trim() && !loading}
                 sx={{
-                  bgcolor: loading ? "grey.400" : "grey.900",
-                  color: "white",
+                  bgcolor: loading ? "background.default" : "text.primary",
+                  color: loading ? "text.primary" : "background.default",
                   width: 32,
                   height: 32,
                   "&:hover": {
-                    bgcolor: loading ? "grey.500" : "grey.800",
+                    bgcolor: loading ? "background.default.hover" : "text.secondary",
                   },
                   "&:disabled": {
-                    bgcolor: "grey.300",
-                    color: "grey.500",
+                    bgcolor: "action.disabledBackground",
+                    color: "action.disabled",
                   },
                 }}
               >

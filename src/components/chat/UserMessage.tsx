@@ -16,7 +16,7 @@ export const UserMessage: React.FC<UserMessageProps> = ({ message }) => {
     <Paper
       elevation={0}
       sx={{
-        bgcolor: "grey.100",
+        bgcolor: "background.paper",
         p: 2,
         borderRadius: 5,
       }}
