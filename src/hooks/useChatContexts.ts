@@ -1,6 +1,6 @@
+import { Message, Task } from "@a2a-js/sdk";
 import React from "react";
 
-import { Message, Task } from "@/types/agent";
 import { ChatContext } from "@/types/chat";
 
 export interface UseChatContextsReturn {

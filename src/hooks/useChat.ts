@@ -1,3 +1,4 @@
+import { AgentCard, SendMessageResponse, Task } from "@a2a-js/sdk";
 import React from "react";
 import { v4 as uuidv4 } from "uuid";
 
@@ -8,7 +9,6 @@ import { useScrolling, UseScrollingReturn } from "@/hooks/useScrolling";
 import { useSelected, UseSelectedReturn } from "@/hooks/useSelected";
 import { sendMessageToAgent } from "@/lib/api/chat";
 import { createMessageSendParams, createTempChatContext, terminalStates } from "@/lib/chat";
-import { AgentCard, SendMessageResponse, Task } from "@/types/agent";
 import { ChatContext } from "@/types/chat";
 
 interface UseChatReturn {

@@ -1,4 +1,5 @@
-import { A2AClient, AgentCard } from "@a2a-js/sdk";
+import { AgentCard } from "@a2a-js/sdk";
+import { A2AClient } from "@a2a-js/sdk/client";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(request: NextRequest) {

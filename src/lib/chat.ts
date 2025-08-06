@@ -1,6 +1,6 @@
+import { AgentCard, MessageSendParams, TaskState } from "@a2a-js/sdk";
 import { v4 as uuidv4 } from "uuid";
 
-import { AgentCard, MessageSendParams, TaskState } from "@/types/agent";
 import { ChatContext } from "@/types/chat";
 
 // Terminal states that should reset tasks

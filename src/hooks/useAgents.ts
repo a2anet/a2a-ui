@@ -1,8 +1,8 @@
+import { AgentCard } from "@a2a-js/sdk";
 import React from "react";
 
 import { useToastContext } from "@/contexts/ToastContext";
 import { getAgentCard } from "@/lib/api/agent-card";
-import { AgentCard } from "@/types/agent";
 
 export interface UseAgentsReturn {
   agents: AgentCard[];
