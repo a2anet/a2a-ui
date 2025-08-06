@@ -1,6 +1,7 @@
 import React from "react";
 
 import { useToastContext } from "@/contexts/ToastContext";
+import { getAgentCard } from "@/lib/api/agent-card";
 import { AgentCard } from "@/types/agent";
 
 export interface UseAgentsReturn {
@@ -22,20 +23,7 @@ export const useAgents = (): UseAgentsReturn => {
     }
 
     try {
-      const response: Response = await fetch("/api/get-agent-card", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ url: url.trim() }),
-      });
-
-      if (!response.ok) {
-        const errorData: { error: string } = await response.json();
-        throw new Error(errorData.error || "Failed to fetch agent card");
-      }
-
-      const { agentCard }: { agentCard: AgentCard } = await response.json();
+      const agentCard = await getAgentCard(url);
 
       setAgents((prev) => {
         // Check if agent already exists

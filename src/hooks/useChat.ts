@@ -6,12 +6,8 @@ import { useAgents, UseAgentsReturn } from "@/hooks/useAgents";
 import { useChatContexts, UseChatContextsReturn } from "@/hooks/useChatContexts";
 import { useScrolling, UseScrollingReturn } from "@/hooks/useScrolling";
 import { useSelected, UseSelectedReturn } from "@/hooks/useSelected";
-import {
-  createMessageSendParams,
-  createTempChatContext,
-  sendMessageToAgent,
-  terminalStates,
-} from "@/lib/chat";
+import { sendMessageToAgent } from "@/lib/api/chat";
+import { createMessageSendParams, createTempChatContext, terminalStates } from "@/lib/chat";
 import { AgentCard, SendMessageResponse, Task } from "@/types/agent";
 import { ChatContext } from "@/types/chat";
 

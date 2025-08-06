@@ -9,7 +9,6 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Invalid URL provided" }, { status: 400 });
     }
 
-    // Fetch the agent card using the A2A SDK on the server side
     const client: A2AClient = new A2AClient(url);
     const agentCard: AgentCard = await client.getAgentCard();
 

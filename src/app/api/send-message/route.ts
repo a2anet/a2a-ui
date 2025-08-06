@@ -14,7 +14,6 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Invalid message parameters provided" }, { status: 400 });
     }
 
-    // Send the message using the A2A SDK on the server side
     const client: A2AClient = new A2AClient(agentUrl);
     const response: SendMessageResponse = await client.sendMessage(messageParams);
 
