@@ -237,7 +237,7 @@ export const Chat: React.FC<ChatProps> = ({
           bottom: 0,
           bgcolor: "background.paper",
           background:
-            "linear-gradient(to top, var(--mui-palette-background-default) 50%, transparent 50%)",
+            "linear-gradient(to top, var(--mui-palette-background-paper) 50%, transparent 50%)",
           pb: 2,
         }}
       >
