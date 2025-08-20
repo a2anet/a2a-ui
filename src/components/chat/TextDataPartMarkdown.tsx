@@ -2,7 +2,7 @@ import { Typography } from "@mui/material";
 import { MuiMarkdown, getOverrides as muiMarkdownGetOverrides, Overrides } from "mui-markdown";
 import { Highlight, themes } from "prism-react-renderer";
 
-import { DataPart, TextPart } from "@/types/agent";
+import { DataPart, TextPart } from "@a2a-js/sdk";
 
 interface TextDataPartMarkdownProps {
   part: TextPart | DataPart;
@@ -74,14 +74,26 @@ const getOverrides = (hideLineNumbers: boolean): Overrides => {
 
 export const TextDataPartMarkdown: React.FC<TextDataPartMarkdownProps> = ({ part }) => {
   if (part.kind === "text") {
-    return <MuiMarkdown overrides={getOverrides(false)}>{part.text}</MuiMarkdown>;
+    return (
+      <MuiMarkdown
+        options={{
+          overrides: getOverrides(false),
+          disableParsingRawHTML: true,
+        }}
+      >
+        {part.text}
+      </MuiMarkdown>
+    );
   } else {
     return (
-      <MuiMarkdown overrides={getOverrides(true)}>{`\`\`\`json\n${JSON.stringify(
-        part.data,
-        null,
-        4
-      )}\`\`\``}</MuiMarkdown>
+      <MuiMarkdown
+        options={{
+          overrides: getOverrides(true),
+          disableParsingRawHTML: true,
+        }}
+      >{`
+\`\`\`json\n${JSON.stringify(part.data, null, 4)}\n\`\`\`
+`}</MuiMarkdown>
     );
   }
 };

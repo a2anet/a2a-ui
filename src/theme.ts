@@ -18,6 +18,10 @@ const theme = createTheme({
     primary: {
       main: "#222",
     },
+    background: {
+      default: "#f5f5f5",
+      paper: "#fff",
+    },
   },
   typography: {
     fontFamily: inter.style.fontFamily,

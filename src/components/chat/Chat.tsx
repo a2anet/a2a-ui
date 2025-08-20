@@ -10,8 +10,8 @@ import { Loading } from "@/components/chat/Loading";
 import { TaskDivider } from "@/components/chat/TaskDivider";
 import { ToolCallAccordion } from "@/components/chat/ToolCallAccordion";
 import { UserMessage } from "@/components/chat/UserMessage";
-import { Artifact, Message } from "@/types/agent";
 import { ChatContext } from "@/types/chat";
+import { Artifact, Message } from "@a2a-js/sdk";
 
 interface TaskDividerItem {
   kind: "task-divider";
@@ -139,7 +139,7 @@ export const Chat: React.FC<ChatProps> = ({
   return (
     <Box
       sx={{
-        bgcolor: "background.default",
+        bgcolor: "background.paper",
         height: "100%",
         overflow: "auto",
       }}
@@ -235,7 +235,7 @@ export const Chat: React.FC<ChatProps> = ({
         sx={{
           position: "sticky",
           bottom: 0,
-          bgcolor: "background.default",
+          bgcolor: "background.paper",
           background:
             "linear-gradient(to top, var(--mui-palette-background-default) 50%, transparent 50%)",
           pb: 2,

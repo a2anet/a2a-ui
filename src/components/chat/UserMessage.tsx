@@ -1,7 +1,7 @@
 import { Paper } from "@mui/material";
 
 import { TextDataPartMarkdown } from "@/components/chat/TextDataPartMarkdown";
-import { DataPart, Message, TextPart } from "@/types/agent";
+import { DataPart, Message, TextPart } from "@a2a-js/sdk";
 
 interface UserMessageProps {
   message: Message;
@@ -16,7 +16,7 @@ export const UserMessage: React.FC<UserMessageProps> = ({ message }) => {
     <Paper
       elevation={0}
       sx={{
-        bgcolor: "background.paper",
+        bgcolor: "background.default",
         p: 2,
         borderRadius: 5,
       }}

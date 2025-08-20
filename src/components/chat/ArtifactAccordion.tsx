@@ -5,7 +5,7 @@ import { Accordion, AccordionDetails, AccordionSummary, Box, Typography } from "
 import React from "react";
 
 import { TextDataPartMarkdown } from "@/components/chat/TextDataPartMarkdown";
-import { Artifact, Part } from "@/types/agent";
+import { Artifact, Part } from "@a2a-js/sdk";
 
 interface ArtifactAccordionProps {
   artifact: Artifact;

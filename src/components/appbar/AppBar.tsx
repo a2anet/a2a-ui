@@ -16,7 +16,7 @@ import React from "react";
 
 import { AddAgentModal } from "@/components/appbar/AddAgentModal";
 import { drawerWidth } from "@/components/sidebar/Sidebar";
-import { AgentCard } from "@/types/agent";
+import { AgentCard } from "@a2a-js/sdk";
 
 interface StyledAppBarProps extends MuiAppBarProps {
   open?: boolean;
@@ -94,7 +94,7 @@ export const AppBar: React.FC<AppBarProps> = ({
         color="transparent"
         elevation={0}
         sx={{
-          bgcolor: "background.default",
+          bgcolor: "background.paper",
           borderBottom: 1,
           borderColor: "divider",
           zIndex: (theme) => theme.zIndex.drawer + 1,

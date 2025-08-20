@@ -10,7 +10,7 @@ import {
 import React from "react";
 
 import { TextDataPartMarkdown } from "@/components/chat/TextDataPartMarkdown";
-import { DataPart, FilePart, Message, TextPart } from "@/types/agent";
+import { DataPart, FilePart, Message, TextPart } from "@a2a-js/sdk";
 
 interface ToolCallAccordionProps {
   toolCallMessage: Message;
@@ -36,8 +36,10 @@ export const ToolCallAccordion: React.FC<ToolCallAccordionProps> = ({
   const resultDataPart: TextPart | DataPart | FilePart | undefined =
     toolCallResultMessage?.parts[0];
 
-  if (resultDataPart && resultDataPart.kind !== "data") {
-    console.error("If `toolCallResultMessage` exists, `parts[0]` should be a `DataPart`");
+  if (resultDataPart && resultDataPart.kind !== "text" && resultDataPart.kind !== "data") {
+    console.error(
+      "If `toolCallResultMessage` exists, `parts[0]` should be a `TextPart` or `DataPart`"
+    );
     return null;
   }
 
