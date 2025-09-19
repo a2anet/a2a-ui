@@ -11,11 +11,11 @@ This repository aims to be like one of the first web browsers that allowed peopl
 
 ![A2A UI Screenshot](/images/A2A%20UI%20Screenshot.jpeg)
 
-## Demo
+## 📺 Demo
 
 Watch [Agent2Agent (A2A) UI Demo - A UI for every agent framework](https://www.youtube.com/watch?v=A4objPue-XM) on YouTube.
 
-## Features
+## ✨ Features
 
 This repository demonstrates how the A2A protocol has standardised communication between people and agents:
 
@@ -25,7 +25,7 @@ This repository demonstrates how the A2A protocol has standardised communication
 - Split units of work within a chat session into **Tasks**
 - Render markdown supported **Messages** and **Artifacts**
 
-## Installation
+## 🛠️ Installation
 
 To install:
 
@@ -33,7 +33,7 @@ To install:
 2. Install the packages: `npm install`
 3. Start the development server: `npm run dev`
 
-## Usage
+## 🚀 Usage
 
 After starting the development server, click "+ Agent" to add an A2A compatible agent.
 For an example, see [Tavily Agent](https://github.com/A2ANet/TavilyAgent).
@@ -59,7 +59,7 @@ Tool calls are split into two parts, a tool call, and a tool call result.
 }
 ```
 
-For an example, see [Tavily Agent's `agent_executor.py`](https://github.com/A2ANet/TavilyAgent/blob/main/agent_executor.py).
+For an example, see the [`LangGraphAgentExecutor`](https://github.com/a2anet/a2anet-python/blob/main/src/a2anet/executors/langgraph.py).
 
 #### Tool Call Result
 
@@ -74,9 +74,9 @@ For an example, see [Tavily Agent's `agent_executor.py`](https://github.com/A2AN
 }
 ```
 
-For an example, see [Tavily Agent's `agent_executor.py`](https://github.com/A2ANet/TavilyAgent/blob/main/agent_executor.py).
+For an example, see [`LangGraphAgentExecutor`](https://github.com/a2anet/a2anet-python/blob/main/src/a2anet/executors/langgraph.py).
 
-## Roadmap
+## 🗺️ Roadmap
 
 - [x] Migrate A2A SDK to server-side APIs
 - [x] Add tool calls
@@ -89,7 +89,7 @@ For an example, see [Tavily Agent's `agent_executor.py`](https://github.com/A2AN
 - [ ] Enable multi-agent conversations
 - [ ] Add push notifications
 
-## Join the A2A Net Community
+## 🤝 Join the A2A Net Community
 
 A2A Net is a site to find and share AI agents and open-source community. Join to share your A2A agents, ask questions, stay up-to-date with the latest A2A news, be the first to hear about open-source releases, tutorials, and more!
 
