@@ -10,7 +10,7 @@
     "post-update": "echo \"codesandbox preview only, need an update\" && pnpm update --latest"
   },
   "dependencies": {
-    "@a2a-js/sdk": "^0.3.1",
+    "@a2a-js/sdk": "^0.3.4",
     "@emotion/cache": "latest",
     "@emotion/react": "latest",
     "@emotion/styled": "latest",

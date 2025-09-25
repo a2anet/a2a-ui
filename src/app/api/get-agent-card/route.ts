@@ -10,7 +10,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Invalid URL provided" }, { status: 400 });
     }
 
-    const client: A2AClient = new A2AClient(url);
+    const client: A2AClient = await A2AClient.fromCardUrl(url);
     const agentCard: AgentCard = await client.getAgentCard();
 
     return NextResponse.json({ agentCard });

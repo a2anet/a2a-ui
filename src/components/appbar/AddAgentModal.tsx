@@ -56,8 +56,8 @@ export const AddAgentModal: React.FC<AddAgentModalProps> = ({ open, onClose, add
       <DialogContent>
         <Box sx={{ pt: 1 }}>
           <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-            Enter the base URL of the agent to add it to your list. The agent card will be
-            automatically fetched from the /.well-known/agent.json endpoint.
+            Enter the base URL (e.g. https://example.com) or full URL (e.g.
+            https://example.com/.well-known/agent-card.json) of the Agent Card.
           </Typography>
 
           <TextField

@@ -1,4 +1,4 @@
-import { AgentCard, SendMessageResponse, Task } from "@a2a-js/sdk";
+import { AgentCard, MessageSendParams, SendMessageResponse, Task } from "@a2a-js/sdk";
 import React from "react";
 import { v4 as uuidv4 } from "uuid";
 
@@ -157,7 +157,11 @@ export const useChat = (): UseChatReturn => {
     }
 
     try {
-      const messageSendParams = createMessageSendParams(messageText, contextId, activeTask?.id);
+      const messageSendParams: MessageSendParams = createMessageSendParams(
+        messageText,
+        contextId,
+        activeTask?.id
+      );
 
       // Set loading, message text, and pending message
       chatContexts.setChatContextLoading(contextId, true);
@@ -170,7 +174,7 @@ export const useChat = (): UseChatReturn => {
 
       // Send message
       const response: SendMessageResponse = await sendMessageToAgent(
-        agents.activeAgent.url,
+        agents.activeAgent,
         messageSendParams
       );
 
