@@ -1,12 +1,5 @@
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
-import {
-  Accordion,
-  AccordionDetails,
-  AccordionSummary,
-  Box,
-  Divider,
-  Typography,
-} from "@mui/material";
+import { Accordion, AccordionDetails, AccordionSummary, Box, Typography } from "@mui/material";
 import React from "react";
 
 import { TextDataPartMarkdown } from "@/components/chat/TextDataPartMarkdown";
@@ -61,10 +54,9 @@ export const ToolCallAccordion: React.FC<ToolCallAccordionProps> = ({
         <TextDataPartMarkdown part={argsDataPart} />
 
         {resultDataPart && (
-          <>
-            <Divider />
+          <Box sx={{ mt: 2 }}>
             <TextDataPartMarkdown part={resultDataPart} />
-          </>
+          </Box>
         )}
       </AccordionDetails>
     </Accordion>
