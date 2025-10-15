@@ -3,48 +3,50 @@ import React from "react";
 
 import { useToastContext } from "@/contexts/ToastContext";
 import { getAgentCard } from "@/lib/api/agent-card";
+import { AgentWithAuth } from "@/types/agent";
 
 export interface UseAgentsReturn {
-  agents: AgentCard[];
-  activeAgent: AgentCard | null;
-  addAgentByUrl: (url: string) => Promise<void>;
-  setActiveAgent: (agent: AgentCard | null) => void;
+  agents: AgentWithAuth[];
+  activeAgent: AgentWithAuth | null;
+  addAgentByUrl: (url: string, authToken?: string) => Promise<void>;
+  setActiveAgent: (agent: AgentWithAuth | null) => void;
 }
 
 export const useAgents = (): UseAgentsReturn => {
-  const [agents, setAgents] = React.useState<AgentCard[]>([]);
-  const [activeAgent, setActiveAgent] = React.useState<AgentCard | null>(null);
+  const [agents, setAgents] = React.useState<AgentWithAuth[]>([]);
+  const [activeAgent, setActiveAgent] = React.useState<AgentWithAuth | null>(null);
 
   const { showToast } = useToastContext();
 
-  const addAgentByUrl = async (url: string): Promise<void> => {
+  const addAgentByUrl = async (url: string, authToken?: string): Promise<void> => {
     if (!url.trim()) {
       return;
     }
 
     try {
-      const agentCard = await getAgentCard(url);
+      const agentCard = await getAgentCard(url, authToken);
+      const agentWithAuth: AgentWithAuth = { agentCard, authToken };
 
       setAgents((prev) => {
         // Check if agent already exists
         const existingIndex = prev.findIndex(
-          (existingAgent) => existingAgent.url === agentCard.url
+          (existingAgent) => existingAgent.agentCard.url === agentCard.url,
         );
 
         const newAgents = [...prev];
 
         if (existingIndex === -1) {
           // Add the new agent
-          newAgents.push(agentCard);
+          newAgents.push(agentWithAuth);
         } else {
           // Replace the existing agent
-          newAgents[existingIndex] = agentCard;
+          newAgents[existingIndex] = agentWithAuth;
         }
 
         return newAgents;
       });
 
-      setActiveAgent(agentCard);
+      setActiveAgent(agentWithAuth);
       showToast(`Added ${agentCard.name}`, "success");
     } catch (error) {
       console.error("Error adding agent:", error);

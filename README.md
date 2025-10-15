@@ -25,6 +25,16 @@ This repository demonstrates how the A2A protocol has standardised communication
 - Split units of work within a chat session into **Tasks**
 - Render markdown supported **Messages** and **Artifacts**
 
+## 🔐 Authentication
+
+The A2A UI supports optional Bearer token authentication when adding agents. If an agent requires authentication:
+
+1. When adding an agent, fill in the optional "Auth Token" field with your Bearer token
+2. The token will be used for both fetching the agent card and sending messages
+3. Tokens are stored securely with each agent and used automatically for all operations
+
+The authentication is implemented using the standard Bearer token format in the Authorization header, which is compatible with most agent frameworks.
+
 ## 🛠️ Installation
 
 To install:

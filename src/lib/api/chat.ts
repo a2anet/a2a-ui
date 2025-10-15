@@ -1,8 +1,9 @@
-import { AgentCard, MessageSendParams, SendMessageResponse } from "@a2a-js/sdk";
+import { MessageSendParams, SendMessageResponse } from "@a2a-js/sdk";
+import { AgentWithAuth } from "@/types/agent";
 
 export const sendMessageToAgent = async (
-  agentCard: AgentCard,
-  messageParams: MessageSendParams
+  agent: AgentWithAuth,
+  messageParams: MessageSendParams,
 ): Promise<SendMessageResponse> => {
   const apiResponse: Response = await fetch("/api/send-message", {
     method: "POST",
@@ -10,7 +11,8 @@ export const sendMessageToAgent = async (
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
-      agentCard,
+      agentCard: agent.agentCard,
+      authToken: agent.authToken,
       messageParams,
     }),
   });
