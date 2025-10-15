@@ -13,15 +13,17 @@ import React from "react";
 interface AddAgentModalProps {
   open: boolean;
   onClose: () => void;
-  addAgentByUrl: (url: string) => Promise<void>;
+  addAgentByUrl: (url: string, authToken?: string) => Promise<void>;
 }
 
 export const AddAgentModal: React.FC<AddAgentModalProps> = ({ open, onClose, addAgentByUrl }) => {
   const [url, setUrl] = React.useState<string>("");
+  const [authToken, setAuthToken] = React.useState<string>("");
   const [loading, setLoading] = React.useState<boolean>(false);
 
   const handleClose = (): void => {
     setUrl("");
+    setAuthToken("");
     setLoading(false);
     onClose();
   };
@@ -34,7 +36,7 @@ export const AddAgentModal: React.FC<AddAgentModalProps> = ({ open, onClose, add
     setLoading(true);
 
     try {
-      await addAgentByUrl(url.trim());
+      await addAgentByUrl(url.trim(), authToken.trim() || undefined);
       handleClose();
     } catch (error) {
       console.error("Error adding agent:", error);
@@ -71,6 +73,19 @@ export const AddAgentModal: React.FC<AddAgentModalProps> = ({ open, onClose, add
             fullWidth
             variant="outlined"
             sx={{ mt: 1 }}
+          />
+
+          <TextField
+            label="Auth Token (Optional)"
+            placeholder="Bearer token for authentication"
+            value={authToken}
+            onChange={(e) => setAuthToken(e.target.value)}
+            onKeyDown={handleKeyPress}
+            disabled={loading}
+            fullWidth
+            variant="outlined"
+            type="password"
+            sx={{ mt: 2 }}
           />
         </Box>
       </DialogContent>

@@ -17,6 +17,7 @@ import React from "react";
 import { AddAgentModal } from "@/components/appbar/AddAgentModal";
 import { drawerWidth } from "@/components/sidebar/Sidebar";
 import { AgentCard } from "@a2a-js/sdk";
+import { AgentWithAuth } from "@/types/agent";
 
 interface StyledAppBarProps extends MuiAppBarProps {
   open?: boolean;
@@ -45,11 +46,11 @@ const StyledAppBar = styled(MuiAppBar, {
 }));
 
 interface AppBarProps {
-  agents: AgentCard[];
-  activeAgent: AgentCard | null;
+  agents: AgentWithAuth[];
+  activeAgent: AgentWithAuth | null;
   sidebarOpen: boolean;
-  addAgentByUrl: (url: string) => Promise<void>;
-  onAgentSelect: (agent: AgentCard) => void;
+  addAgentByUrl: (url: string, authToken?: string) => Promise<void>;
+  onAgentSelect: (agent: AgentWithAuth) => void;
   onToggleSidebar: () => void;
   onNewChat: () => void;
 }
@@ -78,13 +79,13 @@ export const AppBar: React.FC<AppBarProps> = ({
     setAnchorEl(null);
   };
 
-  const handleAgentSelect = (agent: AgentCard): void => {
+  const handleAgentSelect = (agent: AgentWithAuth): void => {
     onAgentSelect(agent);
     onNewChat();
     handleClose();
   };
 
-  const agentButtonText = activeAgent?.name ?? "A2A Net";
+  const agentButtonText = activeAgent?.agentCard.name ?? "A2A Net";
 
   return (
     <>
@@ -172,9 +173,9 @@ export const AppBar: React.FC<AppBarProps> = ({
         >
           {agents.map((agent) => (
             <MenuItem
-              key={agent.url}
+              key={agent.agentCard.url}
               onClick={() => handleAgentSelect(agent)}
-              selected={activeAgent?.url === agent.url}
+              selected={activeAgent?.agentCard.url === agent.agentCard.url}
               sx={{
                 width: 420,
                 mx: 1,
@@ -199,7 +200,7 @@ export const AppBar: React.FC<AppBarProps> = ({
                   width: 1,
                 }}
               >
-                <Typography variant="subtitle2">{agent.name}</Typography>
+                <Typography variant="subtitle2">{agent.agentCard.name}</Typography>
                 <Typography
                   variant="body2"
                   color="text.secondary"
@@ -209,7 +210,7 @@ export const AppBar: React.FC<AppBarProps> = ({
                     width: 1,
                   }}
                 >
-                  {agent.description}
+                  {agent.agentCard.description}
                 </Typography>
               </Box>
             </MenuItem>

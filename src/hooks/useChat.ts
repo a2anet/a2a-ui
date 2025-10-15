@@ -9,6 +9,7 @@ import { useScrolling, UseScrollingReturn } from "@/hooks/useScrolling";
 import { useSelected, UseSelectedReturn } from "@/hooks/useSelected";
 import { sendMessageToAgent } from "@/lib/api/chat";
 import { createMessageSendParams, createTempChatContext, terminalStates } from "@/lib/chat";
+import { AgentWithAuth } from "@/types/agent";
 import { ChatContext } from "@/types/chat";
 
 interface UseChatReturn {
@@ -26,7 +27,7 @@ interface UseChatReturn {
   handleContextSelect: (contextId: string) => void;
   handleTaskSelect: (taskId: string) => void;
   handleArtifactSelect: (artifactId: string) => void;
-  handleAgentSelect: (agent: AgentCard) => void;
+  handleAgentSelect: (agent: AgentWithAuth) => void;
 }
 
 export const useChat = (): UseChatReturn => {
@@ -112,9 +113,11 @@ export const useChat = (): UseChatReturn => {
 
     // Set the active agent for this context
     if (context) {
-      const foundAgent = agents.agents.find((agent: AgentCard) => agent.url === context.agent.url);
+      const foundAgent = agents.agents.find(
+        (agent: AgentWithAuth) => agent.agentCard.url === context.agent.url,
+      );
       if (foundAgent) {
-        agents.setActiveAgent(context.agent);
+        agents.setActiveAgent(foundAgent);
       }
     }
 
@@ -135,7 +138,7 @@ export const useChat = (): UseChatReturn => {
     scrolling.setScrollToArtifactId(artifactId);
   };
 
-  const handleAgentSelect = (agent: AgentCard): void => {
+  const handleAgentSelect = (agent: AgentWithAuth): void => {
     agents.setActiveAgent(agent);
     handleNewChat();
   };
@@ -151,7 +154,10 @@ export const useChat = (): UseChatReturn => {
     const isNewContext: boolean = !activeChatContext?.contextId;
 
     if (isNewContext) {
-      const tempContext: ChatContext = createTempChatContext(contextId, agents.activeAgent);
+      const tempContext: ChatContext = createTempChatContext(
+        contextId,
+        agents.activeAgent.agentCard,
+      );
       chatContexts.addChatContext(tempContext);
       selected.setSelectedContextId(contextId);
     }
@@ -160,7 +166,7 @@ export const useChat = (): UseChatReturn => {
       const messageSendParams: MessageSendParams = createMessageSendParams(
         messageText,
         contextId,
-        activeTask?.id
+        activeTask?.id,
       );
 
       // Set loading, message text, and pending message
@@ -175,7 +181,7 @@ export const useChat = (): UseChatReturn => {
       // Send message
       const response: SendMessageResponse = await sendMessageToAgent(
         agents.activeAgent,
-        messageSendParams
+        messageSendParams,
       );
 
       if ("result" in response) {
@@ -191,7 +197,7 @@ export const useChat = (): UseChatReturn => {
           contextId,
           isNewContext,
           messageText,
-          "Something went wrong processing your message. Please try again."
+          "Something went wrong processing your message. Please try again.",
         );
       }
     } catch (error) {
@@ -201,7 +207,7 @@ export const useChat = (): UseChatReturn => {
         contextId,
         isNewContext,
         messageText,
-        "Something went wrong sending your message. Please try again."
+        "Something went wrong sending your message. Please try again.",
       );
     }
   };
@@ -210,7 +216,7 @@ export const useChat = (): UseChatReturn => {
     contextId: string,
     isNewContext: boolean,
     messageText: string,
-    toastMessage: string
+    toastMessage: string,
   ): void => {
     if (isNewContext) {
       chatContexts.removeChatContext(contextId);
