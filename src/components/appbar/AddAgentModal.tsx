@@ -55,7 +55,7 @@ export const AddAgentModal: React.FC<AddAgentModalProps> = ({ open, onClose, add
 
       <DialogContent>
         <Box sx={{ pt: 1 }}>
-          <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+          <Typography variant="body2" color="text.secondary" gutterBottom>
             Enter the base URL (e.g. https://example.com) or full URL (e.g.
             https://example.com/.well-known/agent-card.json) of the Agent Card.
           </Typography>

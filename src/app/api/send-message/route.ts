@@ -4,8 +4,19 @@ import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(request: NextRequest) {
   try {
-    const { agentCard, messageParams }: { agentCard: AgentCard; messageParams: MessageSendParams } =
-      (await request.json()) as { agentCard: AgentCard; messageParams: MessageSendParams };
+    const {
+      agentCard,
+      messageParams,
+      customHeaders,
+    }: {
+      agentCard: AgentCard;
+      messageParams: MessageSendParams;
+      customHeaders?: Record<string, string>;
+    } = (await request.json()) as {
+      agentCard: AgentCard;
+      messageParams: MessageSendParams;
+      customHeaders?: Record<string, string>;
+    };
 
     if (!agentCard) {
       return NextResponse.json({ error: "Invalid agent card provided" }, { status: 400 });
@@ -15,7 +26,24 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Invalid message parameters provided" }, { status: 400 });
     }
 
-    const client: A2AClient = new A2AClient(agentCard);
+    let client: A2AClient;
+
+    if (customHeaders && Object.keys(customHeaders).length > 0) {
+      const fetchWithCustomHeaders: typeof fetch = async (url, init) => {
+        const headers = new Headers(init?.headers);
+        Object.entries(customHeaders).forEach(([key, value]) => {
+          headers.set(key, value);
+        });
+        const newInit = { ...init, headers };
+
+        return fetch(url, newInit);
+      };
+
+      client = new A2AClient(agentCard, { fetchImpl: fetchWithCustomHeaders });
+    } else {
+      client = new A2AClient(agentCard);
+    }
+
     const response: SendMessageResponse = await client.sendMessage(messageParams);
 
     return NextResponse.json({ response });

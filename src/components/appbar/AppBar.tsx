@@ -1,4 +1,10 @@
-import { Add, Chat as ChatIcon, KeyboardArrowDown, Menu as MenuIcon } from "@mui/icons-material";
+import {
+  Add,
+  Chat as ChatIcon,
+  KeyboardArrowDown,
+  Menu as MenuIcon,
+  Settings,
+} from "@mui/icons-material";
 import {
   Box,
   Button,
@@ -15,7 +21,9 @@ import { styled } from "@mui/material/styles";
 import React from "react";
 
 import { AddAgentModal } from "@/components/appbar/AddAgentModal";
+import { SettingsModal } from "@/components/appbar/SettingsModal";
 import { drawerWidth } from "@/components/sidebar/Sidebar";
+import { CustomHeader } from "@/hooks/useSettings";
 import { AgentCard } from "@a2a-js/sdk";
 
 interface StyledAppBarProps extends MuiAppBarProps {
@@ -48,23 +56,32 @@ interface AppBarProps {
   agents: AgentCard[];
   activeAgent: AgentCard | null;
   sidebarOpen: boolean;
+  customHeaders: CustomHeader[];
   addAgentByUrl: (url: string) => Promise<void>;
   onAgentSelect: (agent: AgentCard) => void;
   onToggleSidebar: () => void;
   onNewChat: () => void;
+  onAddHeader: () => void;
+  onUpdateHeader: (id: string, key: string, value: string) => void;
+  onRemoveHeader: (id: string) => void;
 }
 
 export const AppBar: React.FC<AppBarProps> = ({
   agents,
   activeAgent,
   sidebarOpen,
+  customHeaders,
   addAgentByUrl,
   onAgentSelect,
   onToggleSidebar,
   onNewChat,
+  onAddHeader,
+  onUpdateHeader,
+  onRemoveHeader,
 }) => {
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const [addAgentModalOpen, setAddAgentModalOpen] = React.useState<boolean>(false);
+  const [settingsModalOpen, setSettingsModalOpen] = React.useState<boolean>(false);
   const open = Boolean(anchorEl);
 
   const handleClick = (event: React.MouseEvent<HTMLButtonElement>): void => {
@@ -133,22 +150,28 @@ export const AppBar: React.FC<AppBarProps> = ({
               </Button>
             </Box>
 
-            <Button
-              onClick={() => setAddAgentModalOpen(true)}
-              variant="outlined"
-              startIcon={<Add />}
-              sx={{
-                textTransform: "none",
-                borderColor: "divider",
-                color: "text.primary",
-                "&:hover": {
-                  borderColor: "text.primary",
-                  bgcolor: "action.hover",
-                },
-              }}
-            >
-              Agent
-            </Button>
+            <Box sx={{ display: "flex", gap: 1 }}>
+              <IconButton onClick={() => setSettingsModalOpen(true)} sx={{ color: "text.primary" }}>
+                <Settings />
+              </IconButton>
+
+              <Button
+                onClick={() => setAddAgentModalOpen(true)}
+                variant="outlined"
+                startIcon={<Add />}
+                sx={{
+                  textTransform: "none",
+                  borderColor: "divider",
+                  color: "text.primary",
+                  "&:hover": {
+                    borderColor: "text.primary",
+                    bgcolor: "action.hover",
+                  },
+                }}
+              >
+                Agent
+              </Button>
+            </Box>
           </Toolbar>
         </Container>
 
@@ -221,6 +244,15 @@ export const AppBar: React.FC<AppBarProps> = ({
         open={addAgentModalOpen}
         onClose={() => setAddAgentModalOpen(false)}
         addAgentByUrl={addAgentByUrl}
+      />
+
+      <SettingsModal
+        open={settingsModalOpen}
+        customHeaders={customHeaders}
+        onClose={() => setSettingsModalOpen(false)}
+        onAddHeader={onAddHeader}
+        onUpdateHeader={onUpdateHeader}
+        onRemoveHeader={onRemoveHeader}
       />
     </>
   );

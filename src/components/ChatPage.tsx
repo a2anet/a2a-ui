@@ -43,10 +43,14 @@ export const ChatPage: React.FC = () => {
         agents={chat.agents.agents}
         activeAgent={chat.agents.activeAgent}
         sidebarOpen={sidebarOpen}
+        customHeaders={chat.settings.customHeaders}
         addAgentByUrl={chat.agents.addAgentByUrl}
         onAgentSelect={chat.handleAgentSelect}
         onToggleSidebar={() => setSidebarOpen(true)}
         onNewChat={chat.handleNewChat}
+        onAddHeader={chat.settings.addCustomHeader}
+        onUpdateHeader={chat.settings.updateCustomHeader}
+        onRemoveHeader={chat.settings.removeCustomHeader}
       />
 
       <Sidebar

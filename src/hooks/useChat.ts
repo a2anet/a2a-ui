@@ -7,6 +7,7 @@ import { useAgents, UseAgentsReturn } from "@/hooks/useAgents";
 import { useChatContexts, UseChatContextsReturn } from "@/hooks/useChatContexts";
 import { useScrolling, UseScrollingReturn } from "@/hooks/useScrolling";
 import { useSelected, UseSelectedReturn } from "@/hooks/useSelected";
+import { useSettings, UseSettingsReturn } from "@/hooks/useSettings";
 import { sendMessageToAgent } from "@/lib/api/chat";
 import { createMessageSendParams, createTempChatContext, terminalStates } from "@/lib/chat";
 import { ChatContext } from "@/types/chat";
@@ -16,6 +17,7 @@ interface UseChatReturn {
   chatContexts: UseChatContextsReturn;
   selected: UseSelectedReturn;
   scrolling: UseScrollingReturn;
+  settings: UseSettingsReturn;
   activeChatContext: ChatContext | undefined;
   activeTask: Task | undefined;
   currentMessageText: string;
@@ -37,6 +39,7 @@ export const useChat = (): UseChatReturn => {
   const chatContexts = useChatContexts();
   const selected = useSelected();
   const scrolling = useScrolling();
+  const settings = useSettings();
   const { showToast } = useToastContext();
 
   // Focus text field on initial mount
@@ -175,7 +178,8 @@ export const useChat = (): UseChatReturn => {
       // Send message
       const response: SendMessageResponse = await sendMessageToAgent(
         agents.activeAgent,
-        messageSendParams
+        messageSendParams,
+        settings.getHeadersObject()
       );
 
       if ("result" in response) {
@@ -233,6 +237,7 @@ export const useChat = (): UseChatReturn => {
     chatContexts,
     selected,
     scrolling,
+    settings,
     activeChatContext,
     activeTask,
     currentMessageText,
