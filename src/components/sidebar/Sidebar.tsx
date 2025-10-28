@@ -1,11 +1,13 @@
 import { Chat as ChatIcon, ChevronLeft } from "@mui/icons-material";
 import {
+  Avatar,
   Box,
   Button,
   Drawer,
   IconButton,
   List,
   ListItem,
+  ListItemAvatar,
   ListItemButton,
   ListItemText,
   ListSubheader,
@@ -52,6 +54,26 @@ export const Sidebar: React.FC<SidebarProps> = ({
   onNewChat,
   onClose,
 }) => {
+  const [failedIcons, setFailedIcons] = React.useState<Set<string>>(new Set());
+
+  const getAgentIconUrl = (context: ChatContext): string => {
+    const agentIcon: string | undefined = context.agent.iconUrl;
+
+    if (!agentIcon || failedIcons.has(agentIcon)) {
+      return "/logo.png";
+    }
+
+    return agentIcon;
+  };
+
+  const handleIconError = (iconUrl: string | undefined): void => {
+    if (!iconUrl) {
+      return;
+    }
+
+    setFailedIcons((prev) => new Set(prev).add(iconUrl));
+  };
+
   const getTaskStateText = (state: TaskState): string => {
     // export type TaskState = "submitted" | "working" | "input-required" | "completed" | "canceled" | "failed" | "rejected" | "auth-required" | "unknown";
     switch (state) {
@@ -155,6 +177,14 @@ export const Sidebar: React.FC<SidebarProps> = ({
                         },
                       }}
                     >
+                      <ListItemAvatar>
+                        <Avatar
+                          src={getAgentIconUrl(context)}
+                          alt={context.agent.name}
+                          onError={() => handleIconError(context.agent.iconUrl)}
+                        />
+                      </ListItemAvatar>
+
                       <ListItemText
                         primary={
                           <Typography variant="body2" noWrap>

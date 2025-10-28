@@ -6,6 +6,7 @@ import {
   Settings,
 } from "@mui/icons-material";
 import {
+  Avatar,
   Box,
   Button,
   Container,
@@ -82,6 +83,7 @@ export const AppBar: React.FC<AppBarProps> = ({
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const [addAgentModalOpen, setAddAgentModalOpen] = React.useState<boolean>(false);
   const [settingsModalOpen, setSettingsModalOpen] = React.useState<boolean>(false);
+  const [failedIcons, setFailedIcons] = React.useState<Set<string>>(new Set());
   const open = Boolean(anchorEl);
 
   const handleClick = (event: React.MouseEvent<HTMLButtonElement>): void => {
@@ -99,6 +101,24 @@ export const AppBar: React.FC<AppBarProps> = ({
     onAgentSelect(agent);
     onNewChat();
     handleClose();
+  };
+
+  const getAgentIconUrl = (agent: AgentCard | null | undefined): string => {
+    const agentIcon: string | undefined = agent?.iconUrl;
+
+    if (!agentIcon || failedIcons.has(agentIcon)) {
+      return "/logo.png";
+    }
+
+    return agentIcon;
+  };
+
+  const handleIconError = (iconUrl: string | undefined): void => {
+    if (!iconUrl) {
+      return;
+    }
+
+    setFailedIcons((prev) => new Set(prev).add(iconUrl));
   };
 
   const agentButtonText = activeAgent?.name ?? "A2A Net";
@@ -135,6 +155,14 @@ export const AppBar: React.FC<AppBarProps> = ({
               <Button
                 onClick={handleClick}
                 variant="text"
+                startIcon={
+                  <Avatar
+                    src={getAgentIconUrl(activeAgent)}
+                    sx={{ width: 32, height: 32 }}
+                    alt={agentButtonText}
+                    onError={() => handleIconError(activeAgent?.iconUrl)}
+                  />
+                }
                 endIcon={agents.length > 0 ? <KeyboardArrowDown /> : undefined}
                 sx={{
                   textTransform: "none",
@@ -214,6 +242,13 @@ export const AppBar: React.FC<AppBarProps> = ({
                 },
               }}
             >
+              <Avatar
+                src={getAgentIconUrl(agent)}
+                alt={agent.name}
+                onError={() => handleIconError(agent.iconUrl)}
+                sx={{ mr: 2 }}
+              />
+
               <Box
                 sx={{
                   display: "flex",
