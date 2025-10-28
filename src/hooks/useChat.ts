@@ -1,4 +1,4 @@
-import { AgentCard, MessageSendParams, SendMessageResponse, Task } from "@a2a-js/sdk";
+import { AgentCard, Message, MessageSendParams, SendMessageResponse, Task } from "@a2a-js/sdk";
 import React from "react";
 import { v4 as uuidv4 } from "uuid";
 
@@ -74,7 +74,21 @@ export const useChat = (): UseChatReturn => {
       return undefined;
     }
 
-    return activeChatContext.tasks.find((task) => !terminalStates.includes(task.status.state));
+    // If last item is a Message, no active task
+    const lastItem =
+      activeChatContext.messagesAndTasks[activeChatContext.messagesAndTasks.length - 1];
+
+    if (lastItem && lastItem.kind === "message") {
+      return undefined;
+    }
+
+    // Find last non-terminal Task
+    return activeChatContext.messagesAndTasks
+      .toReversed()
+      .find(
+        (item): item is Task =>
+          item.kind === "task" && !terminalStates.includes((item as Task).status.state)
+      );
   }, [activeChatContext]);
 
   // Get the current message text (from `activeChatContext` if it exists, otherwise from local state)
@@ -105,12 +119,13 @@ export const useChat = (): UseChatReturn => {
     scrolling.setScrollToTaskId(undefined);
     scrolling.setScrollToArtifactId(undefined);
 
-    // Find the context and select its most recent task
+    // Find the context and select its most recent task (if any)
     const context = chatContexts.chatContexts[contextId];
-    if (context && context.tasks.length > 0) {
-      // Select the most recent task (last in the array)
-      const mostRecentTask = context.tasks[context.tasks.length - 1];
-      selected.setSelectedTaskId(mostRecentTask.id);
+    const mostRecentTask = context?.messagesAndTasks
+      .toReversed()
+      .find((item) => item.kind === "task");
+    if (mostRecentTask) {
+      selected.setSelectedTaskId((mostRecentTask as Task).id);
     }
 
     // Set the active agent for this context
@@ -183,9 +198,20 @@ export const useChat = (): UseChatReturn => {
       );
 
       if ("result" in response) {
-        const task = response.result as Task;
-        chatContexts.updateTaskInContext(contextId, task);
-        selected.setSelectedTaskId(task.id);
+        const result: Task | Message = response.result;
+
+        if (result.kind === "message") {
+          // Handle Message response
+          chatContexts.updateMessagesInContext(contextId, [
+            messageSendParams.message,
+            result as Message,
+          ]);
+        } else if (result.kind === "task") {
+          // Handle Task response
+          chatContexts.updateTaskInContext(contextId, result as Task);
+          selected.setSelectedTaskId((result as Task).id);
+        }
+
         chatContexts.setChatContextPendingMessage(contextId, null);
         chatContexts.setChatContextLoading(contextId, false);
       } else {

@@ -38,7 +38,6 @@ To install:
 After starting the development server, click "+ Agent" to add an A2A compatible agent.
 For an example, see [Tavily Agent](https://github.com/A2ANet/TavilyAgent).
 
-- The **A2A Server** must respond with `TaskStatusUpdateEvent` and `TaskArtifactUpdateEvent` objects only, independent `Message` objects are not currently supported.
 - Each chat session (**Context**) is associated with a single agent. For best user experience, the A2A compatible agent should use the `contextId` to access the chat session's chat history.
 
 ### Tool Calls

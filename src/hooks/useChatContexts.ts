@@ -10,8 +10,8 @@ export interface UseChatContextsReturn {
   setChatContextLoading: (contextId: string, loading: boolean) => void;
   setChatContextMessageText: (contextId: string, messageText: string) => void;
   setChatContextPendingMessage: (contextId: string, message: Message | null) => void;
-  addTaskToContext: (contextId: string, task: Task) => void;
-  updateTaskInContext: (contextId: string, newTask: Task) => void;
+  updateMessagesInContext: (contextId: string, messages: Message[]) => void;
+  updateTaskInContext: (contextId: string, task: Task) => void;
 }
 
 export const useChatContexts = (): UseChatContextsReturn => {
@@ -52,27 +52,45 @@ export const useChatContexts = (): UseChatContextsReturn => {
     updateChatContext(contextId, { pendingMessage: message });
   };
 
-  const addTaskToContext = (contextId: string, task: Task): void => {
+  const updateMessagesInContext = (contextId: string, messages: Message[]): void => {
     setChatContexts((prev) => {
       const context = prev[contextId];
       if (!context) return prev;
+
+      const newMessagesAndTasks = [...context.messagesAndTasks];
+
+      for (const message of messages) {
+        const messageIndex = newMessagesAndTasks.findIndex(
+          (item): item is Message => item.kind === "message" && item.messageId === message.messageId
+        );
+
+        if (messageIndex === -1) {
+          // If message not found, add it
+          newMessagesAndTasks.push(message);
+        } else {
+          // If message found, update it
+          newMessagesAndTasks[messageIndex] = message;
+        }
+      }
 
       return {
         ...prev,
         [contextId]: {
           ...context,
-          tasks: [...context.tasks, task],
+          messagesAndTasks: newMessagesAndTasks,
         },
       };
     });
   };
 
-  const updateTaskInContext = (contextId: string, newTask: Task): void => {
+  const updateTaskInContext = (contextId: string, task: Task): void => {
     setChatContexts((prev) => {
       const context = prev[contextId];
       if (!context) return prev;
 
-      const taskIndex = context.tasks.findIndex((task) => task.id === newTask.id);
+      const taskIndex = context.messagesAndTasks.findIndex(
+        (item): item is Task => item.kind === "task" && item.id === task.id
+      );
 
       if (taskIndex === -1) {
         // If task not found, add it
@@ -80,19 +98,19 @@ export const useChatContexts = (): UseChatContextsReturn => {
           ...prev,
           [contextId]: {
             ...context,
-            tasks: [...context.tasks, newTask],
+            messagesAndTasks: [...context.messagesAndTasks, task],
           },
         };
       }
 
-      const newTasks = [...context.tasks];
-      newTasks[taskIndex] = newTask;
+      const newMessagesAndTasks = [...context.messagesAndTasks];
+      newMessagesAndTasks[taskIndex] = task;
 
       return {
         ...prev,
         [contextId]: {
           ...context,
-          tasks: newTasks,
+          messagesAndTasks: newMessagesAndTasks,
         },
       };
     });
@@ -105,7 +123,7 @@ export const useChatContexts = (): UseChatContextsReturn => {
     setChatContextLoading,
     setChatContextMessageText,
     setChatContextPendingMessage,
-    addTaskToContext,
+    updateMessagesInContext,
     updateTaskInContext,
   };
 };

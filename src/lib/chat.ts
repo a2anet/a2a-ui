@@ -30,7 +30,7 @@ export const createMessageSendParams = (
 export const createTempChatContext = (contextId: string, agent: AgentCard): ChatContext => ({
   contextId,
   agent,
-  tasks: [],
+  messagesAndTasks: [],
   pendingMessage: null,
   messageText: "",
   loading: true,

@@ -106,7 +106,9 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
   const selectedTask: Task | undefined =
     selectedContext && selectedTaskId
-      ? selectedContext.tasks.find((task) => task.id === selectedTaskId)
+      ? selectedContext.messagesAndTasks.find(
+          (item): item is Task => item.kind === "task" && (item as Task).id === selectedTaskId
+        )
       : undefined;
 
   return (
@@ -198,40 +200,46 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 ))}
             </List>
 
-            {selectedContext && selectedContext.tasks && selectedContext.tasks.length > 0 && (
-              <List subheader={<ListSubheader>Tasks</ListSubheader>}>
-                {selectedContext.tasks.map((task) => (
-                  <ListItem key={task.id} disablePadding sx={{ px: 1 }}>
-                    <ListItemButton
-                      selected={selectedTaskId === task.id}
-                      onClick={() => onTaskSelect(task.id)}
-                      sx={{
-                        borderRadius: 3,
-                        bgcolor: "background.paper",
-                        "&:hover": {
-                          bgcolor: "action.hover",
-                        },
-                        "&.Mui-selected": {
-                          bgcolor: "action.selected",
-                          "&:hover": {
-                            bgcolor: "action.selected",
-                          },
-                        },
-                      }}
-                    >
-                      <ListItemText
-                        primary={
-                          <Typography variant="body2" noWrap>
-                            {task.id}
-                          </Typography>
-                        }
-                        secondary={getTaskStateText(task.status.state)}
-                      />
-                    </ListItemButton>
-                  </ListItem>
-                ))}
-              </List>
-            )}
+            {selectedContext &&
+              selectedContext.messagesAndTasks &&
+              selectedContext.messagesAndTasks.some(
+                (item): item is Task => item.kind === "task"
+              ) && (
+                <List subheader={<ListSubheader>Tasks</ListSubheader>}>
+                  {selectedContext.messagesAndTasks
+                    .filter((item): item is Task => item.kind === "task")
+                    .map((task: Task) => (
+                      <ListItem key={task.id} disablePadding sx={{ px: 1 }}>
+                        <ListItemButton
+                          selected={selectedTaskId === task.id}
+                          onClick={() => onTaskSelect(task.id)}
+                          sx={{
+                            borderRadius: 3,
+                            bgcolor: "background.paper",
+                            "&:hover": {
+                              bgcolor: "action.hover",
+                            },
+                            "&.Mui-selected": {
+                              bgcolor: "action.selected",
+                              "&:hover": {
+                                bgcolor: "action.selected",
+                              },
+                            },
+                          }}
+                        >
+                          <ListItemText
+                            primary={
+                              <Typography variant="body2" noWrap>
+                                {task.id}
+                              </Typography>
+                            }
+                            secondary={getTaskStateText(task.status.state)}
+                          />
+                        </ListItemButton>
+                      </ListItem>
+                    ))}
+                </List>
+              )}
 
             {selectedTask && selectedTask.artifacts && selectedTask.artifacts.length > 0 && (
               <List subheader={<ListSubheader>Artifacts</ListSubheader>}>

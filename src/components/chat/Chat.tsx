@@ -11,11 +11,12 @@ import { TaskDivider } from "@/components/chat/TaskDivider";
 import { ToolCallAccordion } from "@/components/chat/ToolCallAccordion";
 import { UserMessage } from "@/components/chat/UserMessage";
 import { ChatContext } from "@/types/chat";
-import { Artifact, Message } from "@a2a-js/sdk";
+import { Artifact, Message, Task } from "@a2a-js/sdk";
 
 interface TaskDividerItem {
   kind: "task-divider";
   taskId: string;
+  taskType: "start" | "end";
 }
 
 interface ToolCallItem {
@@ -54,48 +55,62 @@ export const Chat: React.FC<ChatProps> = ({
     const chatItems2: ChatItem[] = [];
 
     if (activeChatContext) {
-      for (const task of activeChatContext.tasks) {
-        // Add task divider at the start of each task
-        chatItems2.push({
-          kind: "task-divider",
-          taskId: task.id,
-        });
+      for (const item of activeChatContext.messagesAndTasks) {
+        if (item.kind === "message") {
+          chatItems2.push(item);
+        } else if (item.kind === "task") {
+          const task = item as Task;
 
-        // Combine history with status message
-        let messages: Message[] = [];
+          // Add task divider at the start of each task
+          chatItems2.push({
+            kind: "task-divider",
+            taskId: task.id,
+            taskType: "start",
+          });
 
-        if (task.history) {
-          messages = [...task.history];
-        }
+          // Combine history with status message
+          let messages: Message[] = [];
 
-        if (task.status.message) {
-          messages.push(task.status.message);
-        }
-
-        // Add messages to chat items
-        for (const message of messages) {
-          if (!message.metadata?.type) {
-            chatItems2.push(message);
-          } else if (message.metadata?.type === "tool-call") {
-            const toolCallId: string = message.metadata.toolCallId as string;
-
-            const toolCallResultMessage: Message | undefined = messages.find(
-              (message) =>
-                message.metadata?.type === "tool-call-result" &&
-                message.metadata?.toolCallId === toolCallId
-            );
-
-            chatItems2.push({
-              kind: "tool-call",
-              toolCallMessage: message,
-              toolCallResultMessage: toolCallResultMessage,
-            });
+          if (task.history) {
+            messages = [...task.history];
           }
-        }
 
-        // Add artifacts if they exist
-        if (task.artifacts) {
-          chatItems2.push(...task.artifacts);
+          if (task.status.message) {
+            messages.push(task.status.message);
+          }
+
+          // Add messages to chat items
+          for (const message of messages) {
+            if (!message.metadata?.type) {
+              chatItems2.push(message);
+            } else if (message.metadata?.type === "tool-call") {
+              const toolCallId: string = message.metadata.toolCallId as string;
+
+              const toolCallResultMessage: Message | undefined = messages.find(
+                (message) =>
+                  message.metadata?.type === "tool-call-result" &&
+                  message.metadata?.toolCallId === toolCallId
+              );
+
+              chatItems2.push({
+                kind: "tool-call",
+                toolCallMessage: message,
+                toolCallResultMessage: toolCallResultMessage,
+              });
+            }
+          }
+
+          // Add artifacts if they exist
+          if (task.artifacts) {
+            chatItems2.push(...task.artifacts);
+          }
+
+          // Add task divider at the end of each task
+          chatItems2.push({
+            kind: "task-divider",
+            taskId: task.id,
+            taskType: "end",
+          });
         }
       }
 
@@ -152,7 +167,7 @@ export const Chat: React.FC<ChatProps> = ({
             const taskDividerItem: TaskDividerItem = item as TaskDividerItem;
 
             return (
-              <Box key={taskDividerItem.taskId} sx={{ mb: 4 }}>
+              <Box key={taskDividerItem.taskId + "-" + taskDividerItem.taskType} sx={{ mb: 4 }}>
                 <TaskDivider
                   taskId={taskDividerItem.taskId}
                   onRef={(el) => {
