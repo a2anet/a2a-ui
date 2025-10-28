@@ -3,6 +3,7 @@ import React from "react";
 
 import { useToastContext } from "@/contexts/ToastContext";
 import { getAgentCard } from "@/lib/api/agent-card";
+import { parseAgentUrls } from "@/lib/env";
 
 export interface UseAgentsReturn {
   agents: AgentCard[];
@@ -53,6 +54,15 @@ export const useAgents = (): UseAgentsReturn => {
       throw error; // Re-throw so the component can handle loading states
     }
   };
+
+  // Load default agent URLs on mount
+  React.useEffect(() => {
+    const defaultUrls: string[] = parseAgentUrls(process.env.NEXT_PUBLIC_DEFAULT_AGENT_URLS);
+
+    for (const url of defaultUrls) {
+      addAgentByUrl(url);
+    }
+  }, []);
 
   return {
     agents,

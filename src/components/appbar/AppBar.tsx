@@ -25,6 +25,7 @@ import { AddAgentModal } from "@/components/appbar/AddAgentModal";
 import { SettingsModal } from "@/components/appbar/SettingsModal";
 import { drawerWidth } from "@/components/sidebar/Sidebar";
 import { CustomHeader } from "@/hooks/useSettings";
+import { getDefaultAppIcon, getDefaultAppName } from "@/lib/env";
 import { AgentCard } from "@a2a-js/sdk";
 
 interface StyledAppBarProps extends MuiAppBarProps {
@@ -107,7 +108,7 @@ export const AppBar: React.FC<AppBarProps> = ({
     const agentIcon: string | undefined = agent?.iconUrl;
 
     if (!agentIcon || failedIcons.has(agentIcon)) {
-      return "/logo.png";
+      return getDefaultAppIcon();
     }
 
     return agentIcon;
@@ -121,7 +122,7 @@ export const AppBar: React.FC<AppBarProps> = ({
     setFailedIcons((prev) => new Set(prev).add(iconUrl));
   };
 
-  const agentButtonText = activeAgent?.name ?? "A2A Net";
+  const agentButtonText = activeAgent?.name ?? getDefaultAppName();
 
   return (
     <>
@@ -255,6 +256,7 @@ export const AppBar: React.FC<AppBarProps> = ({
                   flexDirection: "column",
                   alignItems: "flex-start",
                   width: 1,
+                  minWidth: 0,
                 }}
               >
                 <Typography variant="subtitle2">{agent.name}</Typography>
@@ -264,6 +266,7 @@ export const AppBar: React.FC<AppBarProps> = ({
                   sx={{
                     overflow: "hidden",
                     textOverflow: "ellipsis",
+                    whiteSpace: "nowrap",
                     width: 1,
                   }}
                 >

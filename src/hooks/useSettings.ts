@@ -1,5 +1,7 @@
 import React from "react";
 
+import { parseCustomHeaders } from "@/lib/env";
+
 export interface CustomHeader {
   id: string;
   key: string;
@@ -15,7 +17,9 @@ export interface UseSettingsReturn {
 }
 
 export const useSettings = (): UseSettingsReturn => {
-  const [customHeaders, setCustomHeaders] = React.useState<CustomHeader[]>([]);
+  const [customHeaders, setCustomHeaders] = React.useState<CustomHeader[]>(() =>
+    parseCustomHeaders(process.env.NEXT_PUBLIC_DEFAULT_HEADERS)
+  );
 
   const addCustomHeader = (): void => {
     const newHeader: CustomHeader = {
