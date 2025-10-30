@@ -79,14 +79,12 @@ For an example, see [`LangGraphAgentExecutor`](https://github.com/a2anet/a2anet-
 
 - [x] Migrate A2A SDK to server-side APIs
 - [x] Add tool calls
+- [x] Add message streaming
+- [ ] Create component and hooks library
 - [ ] Add CI/CD
 - [ ] Add tests
 - [ ] Add "Contributing" section
-- [ ] Add message streaming
 - [ ] Add support for files
-- [ ] Create component library
-- [ ] Enable multi-agent conversations
-- [ ] Add push notifications
 
 ## 🤝 Join the A2A Net Community
 

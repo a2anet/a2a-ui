@@ -1,14 +1,15 @@
 import { AgentCard, Message, MessageSendParams, SendMessageResponse, Task } from "@a2a-js/sdk";
+import { A2AClient } from "@a2a-js/sdk/client";
 import React from "react";
 import { v4 as uuidv4 } from "uuid";
 
 import { useToastContext } from "@/contexts/ToastContext";
 import { useAgents, UseAgentsReturn } from "@/hooks/useAgents";
-import { useChatContexts, UseChatContextsReturn } from "@/hooks/useChatContexts";
+import { StreamEvent, useChatContexts, UseChatContextsReturn } from "@/hooks/useChatContexts";
 import { useScrolling, UseScrollingReturn } from "@/hooks/useScrolling";
 import { useSelected, UseSelectedReturn } from "@/hooks/useSelected";
 import { useSettings, UseSettingsReturn } from "@/hooks/useSettings";
-import { sendMessageToAgent } from "@/lib/api/chat";
+import { createA2AProxyFetch } from "@/lib/api/proxy-fetch";
 import { createMessageSendParams, createTempChatContext, terminalStates } from "@/lib/chat";
 import { ChatContext } from "@/types/chat";
 
@@ -188,41 +189,81 @@ export const useChat = (): UseChatReturn => {
       } else {
         chatContexts.setChatContextMessageText(contextId, "");
       }
-      chatContexts.setChatContextPendingMessage(contextId, messageSendParams.message);
 
-      // Send message
-      const response: SendMessageResponse = await sendMessageToAgent(
-        agents.activeAgent,
-        messageSendParams,
-        settings.getHeadersObject()
-      );
+      // Create an A2A Client with an A2A proxy fetch function that allows the it to connect to an
+      // A2A Server through the Next.js proxy.
+      const A2AProxyFetch: typeof fetch = createA2AProxyFetch(settings.getHeadersObject());
+      const client = new A2AClient(agents.activeAgent, { fetchImpl: A2AProxyFetch });
 
-      if ("result" in response) {
-        const result: Task | Message = response.result;
+      if (!agents.activeAgent.capabilities?.streaming) {
+        // Non-streaming
+        chatContexts.setChatContextPendingMessage(contextId, messageSendParams.message);
+        const response: SendMessageResponse = await client.sendMessage(messageSendParams);
 
-        if (result.kind === "message") {
-          // Handle Message response
-          chatContexts.updateMessagesInContext(contextId, [
-            messageSendParams.message,
-            result as Message,
-          ]);
-        } else if (result.kind === "task") {
-          // Handle Task response
-          chatContexts.updateTaskInContext(contextId, result as Task);
-          selected.setSelectedTaskId((result as Task).id);
+        if ("result" in response) {
+          const result: Task | Message = response.result;
+
+          if (result.kind === "message") {
+            // Handle Message response
+            chatContexts.updateMessagesInContext(contextId, [
+              messageSendParams.message,
+              result as Message,
+            ]);
+          } else if (result.kind === "task") {
+            // Handle Task response
+            chatContexts.updateTaskInContext(contextId, result as Task);
+            selected.setSelectedTaskId((result as Task).id);
+          }
+
+          chatContexts.setChatContextPendingMessage(contextId, null);
+          chatContexts.setChatContextLoading(contextId, false);
+        } else {
+          console.error("Error response from A2A agent:", response);
+
+          handleSendMessageError(
+            contextId,
+            isNewContext,
+            messageText,
+            "Something went wrong sending your message. Please try again."
+          );
+        }
+      } else {
+        if (!activeTask?.id) {
+          // New task
+          chatContexts.setChatContextPendingMessage(contextId, messageSendParams.message);
+        } else {
+          // Existing task
+          chatContexts.handleStreamEvent(contextId, messageSendParams.message);
         }
 
-        chatContexts.setChatContextPendingMessage(contextId, null);
-        chatContexts.setChatContextLoading(contextId, false);
-      } else {
-        console.error("Error response from A2A agent:", response);
+        // Streaming
+        try {
+          const stream: AsyncGenerator<StreamEvent, void, unknown> =
+            client.sendMessageStream(messageSendParams);
 
-        handleSendMessageError(
-          contextId,
-          isNewContext,
-          messageText,
-          "Something went wrong processing your message. Please try again."
-        );
+          for await (const event of stream) {
+            if (event.kind === "task") {
+              const task = event as Task;
+              chatContexts.setChatContextPendingMessage(contextId, null);
+              chatContexts.handleStreamEvent(contextId, task);
+              selected.setSelectedTaskId(task.id);
+            } else {
+              chatContexts.handleStreamEvent(contextId, event);
+            }
+          }
+
+          // Stream completed successfully
+          chatContexts.setChatContextLoading(contextId, false);
+        } catch (error) {
+          console.error("Error response from A2A agent:", error);
+
+          handleSendMessageError(
+            contextId,
+            isNewContext,
+            messageText,
+            "Something went wrong sending your message. Please try again."
+          );
+        }
       }
     } catch (error) {
       console.error("Error sending message:", error);
