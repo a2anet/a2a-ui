@@ -15,20 +15,6 @@ export const getDefaultAppIcon = (): string => {
 };
 
 /**
- * Parses a comma-separated list of agent URLs from an environment variable
- */
-export const parseAgentUrls = (envVar: string | undefined): string[] => {
-  if (!envVar || !envVar.trim()) {
-    return [];
-  }
-
-  return envVar
-    .split(",")
-    .map((url) => url.trim())
-    .filter((url) => url.length > 0);
-};
-
-/**
  * Parses a JSON object of custom headers from an environment variable
  */
 export const parseCustomHeaders = (envVar: string | undefined): CustomHeader[] => {

@@ -4,7 +4,6 @@ import React from "react";
 
 import { useToastContext } from "@/contexts/ToastContext";
 import { createA2AProxyFetch } from "@/lib/api/proxy-fetch";
-import { parseAgentUrls } from "@/lib/env";
 
 export interface UseAgentsReturn {
   agents: AgentCard[];
@@ -23,7 +22,7 @@ export const useAgents = (params?: UseAgentsParams): UseAgentsReturn => {
 
   const { showToast } = useToastContext();
 
-  const addAgentByUrl = async (url: string): Promise<void> => {
+  const addAgentByUrl = async (url: string, startupLoad: boolean = false): Promise<void> => {
     if (!url.trim()) {
       return;
     }
@@ -36,41 +35,50 @@ export const useAgents = (params?: UseAgentsParams): UseAgentsReturn => {
       const agentCard: AgentCard = await client.getAgentCard();
 
       setAgents((prev) => {
-        // Check if agent already exists
-        const existingIndex = prev.findIndex(
-          (existingAgent) => existingAgent.url === agentCard.url
-        );
-
         const newAgents = [...prev];
 
-        if (existingIndex === -1) {
-          // Add the new agent
-          newAgents.push(agentCard);
-        } else {
-          // Replace the existing agent
-          newAgents[existingIndex] = agentCard;
-        }
+        // Add the new agent
+        newAgents.push(agentCard);
 
         return newAgents;
       });
 
-      setActiveAgent(agentCard);
-      showToast(`Added ${agentCard.name}`, "success");
+      if (!startupLoad) {
+        // Set active agent and show toast when user adds agent
+        setActiveAgent(agentCard);
+        showToast(`Added ${agentCard.name}`, "success");
+      }
     } catch (error) {
+      if (startupLoad) {
+        // Don't show startup load errors
+        return;
+      }
+
       console.error("Error adding agent:", error);
-      const errorMessage = error instanceof Error ? error.message : "Unknown error occurred";
+      const errorMessage: string =
+        error instanceof Error ? error.message : "Unknown error occurred";
       showToast(`Failed to fetch agent card: ${errorMessage}`, "error");
       throw error; // Re-throw so the component can handle loading states
     }
   };
 
-  // Load default agent URLs on mount
+  // Load Agent Cards from URL on startup
   React.useEffect(() => {
-    const defaultUrls: string[] = parseAgentUrls(process.env.NEXT_PUBLIC_DEFAULT_AGENT_URLS);
+    const agentCardsUrl: string | undefined = process.env.NEXT_PUBLIC_DEFAULT_AGENT_CARDS_URL;
 
-    for (const url of defaultUrls) {
-      addAgentByUrl(url);
+    if (!agentCardsUrl) {
+      return;
     }
+
+    const A2AProxyFetch: typeof fetch = createA2AProxyFetch();
+
+    A2AProxyFetch(agentCardsUrl)
+      .then((response: Response) => response.json())
+      .then((urls: string[]) => {
+        for (const url of urls) {
+          addAgentByUrl(url, true);
+        }
+      });
   }, []);
 
   return {

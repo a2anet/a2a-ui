@@ -224,7 +224,7 @@ export const AppBar: React.FC<AppBarProps> = ({
         >
           {agents.map((agent) => (
             <MenuItem
-              key={agent.url}
+              key={`${agent.name}-${agent.url}`}
               onClick={() => handleAgentSelect(agent)}
               selected={activeAgent?.url === agent.url}
               sx={{
