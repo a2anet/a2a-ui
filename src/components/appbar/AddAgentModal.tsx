@@ -17,11 +17,11 @@ interface AddAgentModalProps {
 }
 
 export const AddAgentModal: React.FC<AddAgentModalProps> = ({ open, onClose, addAgentByUrl }) => {
-  const [url, setUrl] = React.useState<string>("");
+  const [url, setUrl] = React.useState<string>("https://example.com/.well-known/agent-card.json");
   const [loading, setLoading] = React.useState<boolean>(false);
 
   const handleClose = (): void => {
-    setUrl("");
+    setUrl("https://example.com/.well-known/agent-card.json");
     setLoading(false);
     onClose();
   };
@@ -56,13 +56,13 @@ export const AddAgentModal: React.FC<AddAgentModalProps> = ({ open, onClose, add
       <DialogContent>
         <Box sx={{ pt: 1 }}>
           <Typography variant="body2" color="text.secondary" gutterBottom>
-            Enter the base URL (e.g. https://example.com) or full URL (e.g.
-            https://example.com/.well-known/agent-card.json) of the Agent Card.
+            Enter the full URL (e.g. https://example.com/.well-known/agent-card.json) of the Agent
+            Card.
           </Typography>
 
           <TextField
             label="Agent URL"
-            placeholder="https://example.com"
+            placeholder="https://example.com/.well-known/agent-card.json"
             value={url}
             onChange={(e) => setUrl(e.target.value)}
             onKeyDown={handleKeyPress}
