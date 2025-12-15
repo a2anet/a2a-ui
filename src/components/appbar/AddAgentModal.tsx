@@ -17,11 +17,11 @@ interface AddAgentModalProps {
 }
 
 export const AddAgentModal: React.FC<AddAgentModalProps> = ({ open, onClose, addAgentByUrl }) => {
-  const [url, setUrl] = React.useState<string>("https://example.com/.well-known/agent-card.json");
+  const [url, setUrl] = React.useState<string>(process.env.NEXT_PUBLIC_DEFAULT_AGENT_CARDS_URL || "https://example.com/.well-known/agent-card.json");
   const [loading, setLoading] = React.useState<boolean>(false);
 
   const handleClose = (): void => {
-    setUrl("https://example.com/.well-known/agent-card.json");
+    setUrl(process.env.NEXT_PUBLIC_DEFAULT_AGENT_CARDS_URL || "https://example.com/.well-known/agent-card.json");
     setLoading(false);
     onClose();
   };

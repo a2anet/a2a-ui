@@ -120,7 +120,25 @@ export const Chat: React.FC<ChatProps> = ({
       }
     }
 
-    return chatItems2;
+    // Deduplicate messages by messageId, keeping only the latest (last) occurrence
+    const seen = new Set<string>();
+    const deduplicated: ChatItem[] = [];
+    for (let i = chatItems2.length - 1; i >= 0; i--) {
+      const item = chatItems2[i];
+      if ("messageId" in item) {
+        // It's a Message
+        if (!seen.has(item.messageId)) {
+          seen.add(item.messageId);
+          deduplicated.unshift(item);
+        }
+        // Skip if already seen
+      } else {
+        // Non-message items (task-divider, tool-call, artifact) are always included
+        deduplicated.unshift(item);
+      }
+    }
+
+    return deduplicated;
   }, [activeChatContext]);
 
   const handleSendMessage = (message: string): void => {
