@@ -67,8 +67,12 @@ export async function POST(request: NextRequest): Promise<Response> {
 
     const response: Response = await fetch(url, fetchOptions);
 
-    // Hop-by-hop headers that should not be forwarded (per HTTP spec)
-    const hopByHopHeaders = new Set([
+    // Headers that should not be forwarded:
+    // - Hop-by-hop headers per HTTP spec
+    // - content-encoding: response.text() already decompresses the body, so forwarding
+    //   this header causes the browser to try to decompress already-decompressed data
+    // - content-length: invalid after decompression, let the runtime recalculate it
+    const headersToStrip = new Set([
       "connection",
       "keep-alive",
       "proxy-authenticate",
@@ -77,16 +81,17 @@ export async function POST(request: NextRequest): Promise<Response> {
       "trailers",
       "transfer-encoding",
       "upgrade",
+      "content-encoding",
+      "content-length",
     ]);
 
     // Check if the response is a streaming response (SSE)
     const contentType = response.headers.get("Content-Type") || "";
     if (contentType.includes("text/event-stream")) {
-      // Forward all headers except hop-by-hop headers
       const streamHeaders = new Headers();
 
       response.headers.forEach((value, key) => {
-        if (!hopByHopHeaders.has(key.toLowerCase())) {
+        if (!headersToStrip.has(key.toLowerCase())) {
           streamHeaders.set(key, value);
         }
       });
@@ -101,11 +106,10 @@ export async function POST(request: NextRequest): Promise<Response> {
     // For non-streaming responses, read and forward the body
     const responseBody = await response.text();
 
-    // Forward all response headers except hop-by-hop headers
     const responseHeaders = new Headers();
 
     response.headers.forEach((value, key) => {
-      if (!hopByHopHeaders.has(key.toLowerCase())) {
+      if (!headersToStrip.has(key.toLowerCase())) {
         responseHeaders.set(key, value);
       }
     });
